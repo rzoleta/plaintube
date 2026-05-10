@@ -139,6 +139,34 @@ export async function getAllSubscriptions(accessToken: string): Promise<Subscrip
 }
 
 /**
+ * Get basic channel info (title + thumbnail) for a single channel.
+ */
+export async function getChannelInfo(
+	channelId: string,
+	accessToken: string
+): Promise<{ title: string; thumbnailUrl: string } | null> {
+	interface YTChannelList {
+		items?: Array<{
+			snippet: {
+				title: string;
+				thumbnails: { medium?: { url: string }; default?: { url: string } };
+			};
+		}>;
+	}
+	const data = await ytFetch<YTChannelList>(
+		'channels',
+		{ part: 'snippet', id: channelId },
+		accessToken
+	);
+	const item = data.items?.[0];
+	if (!item) return null;
+	return {
+		title: item.snippet.title,
+		thumbnailUrl: item.snippet.thumbnails.medium?.url ?? item.snippet.thumbnails.default?.url ?? ''
+	};
+}
+
+/**
  * Get uploads playlist IDs for up to 50 channel IDs in one API call.
  * Returns a map of channelId → uploadsPlaylistId.
  */

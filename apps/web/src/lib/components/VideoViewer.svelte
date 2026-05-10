@@ -5,6 +5,8 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Archive, Bookmark, BookmarkCheck } from 'lucide-svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { derived } from 'svelte/store';
 
 	interface Props {
 		video: VideoItem | null;
@@ -25,21 +27,46 @@
 
 	function handleMarkWatched() {
 		if (!video) return;
-		if (isWatched) {
-			unmarkWatched(video.videoId);
-		} else {
-			markWatched(video.videoId);
-		}
+		if (isWatched) unmarkWatched(video.videoId);
+		else markWatched(video.videoId);
 	}
 
 	function handleSaveToggle() {
 		if (!video) return;
-		if (isSaved) {
-			unsaveVideo(video.videoId);
-		} else {
-			saveVideo(video);
-		}
+		if (isSaved) unsaveVideo(video.videoId);
+		else saveVideo(video);
 	}
+
+	// Reactive store for the current channelId so TanStack Query can react to changes
+	function channelIdStore() {
+		let subscribers: Array<(v: string | null) => void> = [];
+		let value: string | null = video?.channelId ?? null;
+		const store = {
+			subscribe(fn: (v: string | null) => void) {
+				subscribers.push(fn);
+				fn(value);
+				return () => { subscribers = subscribers.filter((s) => s !== fn); };
+			},
+			set(v: string | null) { value = v; subscribers.forEach((s) => s(v)); }
+		};
+		return store;
+	}
+
+	const channelId = channelIdStore();
+	$effect(() => { channelId.set(video?.channelId ?? null); });
+
+	const channelOptions = derived(channelId, ($channelId) => ({
+		queryKey: ['channel-info', $channelId ?? ''] as const,
+		queryFn: async () => {
+			const res = await fetch(`/api/channel/${$channelId}`);
+			if (!res.ok) return null;
+			return res.json() as Promise<{ title: string; thumbnailUrl: string }>;
+		},
+		enabled: $channelId !== null,
+		staleTime: 1000 * 60 * 60 // channel avatars rarely change
+	}));
+
+	const channelQuery = createQuery(channelOptions);
 </script>
 
 <section class="flex h-full flex-col overflow-hidden bg-background">
@@ -62,15 +89,42 @@
 		<div class="flex-1 overflow-y-auto scrollbar-thin p-4">
 			<!-- Title + buttons row -->
 			<div class="flex items-start justify-between gap-3">
-				<div class="min-w-0">
+				<div class="min-w-0 flex-1">
 					<h1 class="text-base font-semibold leading-snug text-foreground">
 						{video.title}
 					</h1>
-					<p class="mt-1 text-sm text-muted-foreground">
-						{video.channelTitle}
-						<span class="mx-1 text-muted-foreground/40">·</span>
-						{formatDate(video.publishedAt)}
-					</p>
+
+					<!-- Channel row -->
+					<div class="mt-2 flex items-center gap-2">
+						<a
+							href="https://www.youtube.com/channel/{video.channelId}"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="shrink-0"
+							tabindex="-1"
+						>
+							{#if $channelQuery.data?.thumbnailUrl}
+								<img
+									src={$channelQuery.data.thumbnailUrl}
+									alt={video.channelTitle}
+									class="h-8 w-8 rounded-full object-cover ring-1 ring-border"
+								/>
+							{:else}
+								<div class="h-8 w-8 rounded-full bg-muted ring-1 ring-border"></div>
+							{/if}
+						</a>
+						<div class="min-w-0">
+							<a
+								href="https://www.youtube.com/channel/{video.channelId}"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-sm font-medium text-foreground hover:underline truncate block"
+							>
+								{video.channelTitle}
+							</a>
+							<p class="text-xs text-muted-foreground">{formatDate(video.publishedAt)}</p>
+						</div>
+					</div>
 				</div>
 
 				<div class="flex shrink-0 gap-2 pt-0.5">
