@@ -79,9 +79,12 @@
 		<!-- Main sections -->
 		{#each mainSections as section (section.id)}
 			<Button
-				variant={isActive(section.id) ? 'default' : 'ghost'}
+				variant="ghost"
 				size="sm"
-				class="w-full justify-start text-xs h-7 gap-2"
+				class={cn(
+					'w-full justify-start text-xs h-7 gap-2',
+					isActive(section.id) && 'bg-primary/10 text-primary font-medium hover:bg-primary/15 hover:text-primary'
+				)}
 				onclick={() => onSelectSection(section.id)}
 			>
 				<section.icon class="h-3.5 w-3.5 shrink-0" />
@@ -114,9 +117,12 @@
 					{:else if $playlistsQuery.data}
 						{#each $playlistsQuery.data.items as playlist (playlist.id)}
 							<Button
-								variant={activePlaylistId === playlist.id ? 'default' : 'ghost'}
+								variant="ghost"
 								size="sm"
-								class="w-full justify-start text-xs h-7 pl-4 truncate"
+								class={cn(
+									'w-full justify-start text-xs h-7 pl-4 truncate',
+									activePlaylistId === playlist.id && 'bg-primary/10 text-primary font-medium hover:bg-primary/15 hover:text-primary'
+								)}
 								onclick={() => onSelectPlaylist(playlist.id, playlist.title)}
 								title={playlist.title}
 							>
@@ -157,9 +163,12 @@
 					{:else if $subscriptionsQuery.data}
 						{#each $subscriptionsQuery.data as sub (sub.channelId)}
 							<Button
-								variant={activeChannelId === sub.channelId ? 'default' : 'ghost'}
+								variant="ghost"
 								size="sm"
-								class="w-full justify-start text-xs h-7 pl-3 gap-1.5"
+								class={cn(
+									'w-full justify-start text-xs h-7 pl-3 gap-1.5',
+									activeChannelId === sub.channelId && 'bg-primary/10 text-primary font-medium hover:bg-primary/15 hover:text-primary'
+								)}
 								onclick={() => onSelectChannel(sub.channelId, sub.title)}
 								title={sub.title}
 							>
