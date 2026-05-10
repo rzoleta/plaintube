@@ -19,6 +19,8 @@ export interface VideoItem {
 	channelTitle: string;
 	publishedAt: string;
 	thumbnailUrl: string;
+	/** Channel avatar URL when available (e.g. inbox merge, client enrich). */
+	channelThumbnailUrl?: string;
 	playlistId?: string;
 }
 

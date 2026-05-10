@@ -55,7 +55,13 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 				return true;
 			});
 
-		return json({ items: deduped, nextPageToken: null });
+		const channelThumbById = new Map(subs.map((s) => [s.channelId, s.thumbnailUrl]));
+		const items: VideoItem[] = deduped.map((v) => ({
+			...v,
+			channelThumbnailUrl: channelThumbById.get(v.channelId) ?? v.channelThumbnailUrl
+		}));
+
+		return json({ items, nextPageToken: null });
 	} catch (err) {
 		const message = err instanceof Error ? err.message : 'Unknown error';
 		console.error('[/api/inbox]', message);

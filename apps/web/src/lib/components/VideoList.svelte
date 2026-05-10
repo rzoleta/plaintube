@@ -2,7 +2,7 @@
 	import { derived } from 'svelte/store';
 	import { createInfiniteQuery, createQuery, type InfiniteData } from '@tanstack/svelte-query';
 	import VideoCard from './VideoCard.svelte';
-	import type { VideoItem, PaginatedVideos } from '$lib/api/youtube';
+	import type { VideoItem, PaginatedVideos, Subscription } from '$lib/api/youtube';
 	import { watchedIds } from '$lib/stores/watched';
 	import { savedVideos } from '$lib/stores/saved';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -133,6 +133,23 @@
 		inboxOptions
 	);
 
+	// Shared with Sidebar queryKey — warms cache for saved/archived channel avatars.
+	const subscriptionsQuery = createQuery<Subscription[], Error, Subscription[], readonly string[]>({
+		queryKey: ['subscriptions'],
+		queryFn: async () => {
+			const cached = sessionStorage.getItem('plaintube:subscriptions');
+			if (cached) {
+				return JSON.parse(cached) as Subscription[];
+			}
+			const res = await fetch('/api/subscriptions');
+			if (!res.ok) throw new Error('Failed to fetch subscriptions');
+			const data = (await res.json()) as Subscription[];
+			sessionStorage.setItem('plaintube:subscriptions', JSON.stringify(data));
+			return data;
+		},
+		staleTime: 1000 * 60 * 30
+	});
+
 	// ─── Derived state ────────────────────────────────────────────────────────
 
 	const allChannelVideos = $derived(
@@ -156,6 +173,24 @@
 							? 'Saved'
 							: ''
 	);
+
+	const useChannelThumbnailInList = $derived(
+		!activeChannelId &&
+			!activePlaylistId &&
+			(activeSection === 'inbox' || activeSection === 'saved' || activeSection === 'watched')
+	);
+
+	const subscriptionChannelThumbById = $derived(
+		new Map(($subscriptionsQuery.data ?? []).map((s) => [s.channelId, s.thumbnailUrl]))
+	);
+
+	function channelListThumbnail(video: VideoItem): string | undefined {
+		if (!useChannelThumbnailInList) return undefined;
+		const fromVideo = video.channelThumbnailUrl?.trim();
+		if (fromVideo) return fromVideo;
+		const fromSub = subscriptionChannelThumbById.get(video.channelId)?.trim();
+		return fromSub || undefined;
+	}
 
 	const finalVideos = $derived((): VideoItem[] => {
 		if (activeChannelId) {
@@ -270,6 +305,8 @@
 					{video}
 					isActive={selectedVideoId === video.videoId}
 					onClick={onSelectVideo}
+					listThumbnailUrl={channelListThumbnail(video)}
+					listThumbnailAsAvatar={useChannelThumbnailInList}
 				/>
 			{/each}
 

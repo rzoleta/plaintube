@@ -10,9 +10,19 @@
     video: VideoItem;
     isActive: boolean;
     onClick: (video: VideoItem) => void;
+    /** When set, shown instead of the video thumbnail (e.g. channel avatar). */
+    listThumbnailUrl?: string;
+    /** Circular square crop (channel-style) vs 16×12 video poster. */
+    listThumbnailAsAvatar?: boolean;
   }
 
-  const { video, isActive, onClick }: Props = $props();
+  const {
+    video,
+    isActive,
+    onClick,
+    listThumbnailUrl,
+    listThumbnailAsAvatar = false
+  }: Props = $props();
 
   function formatRelativeTime(dateStr: string): string {
     const date = new Date(dateStr);
@@ -38,6 +48,7 @@
   const isWatched = $derived($watchedIds.has(video.videoId));
   const isSaved = $derived($savedVideos.some((v) => v.videoId === video.videoId));
   const relativeTime = $derived(formatRelativeTime(video.publishedAt));
+  const displayThumbUrl = $derived(listThumbnailUrl ?? video.thumbnailUrl);
 
   function handleArchive(e: MouseEvent) {
     e.stopPropagation();
@@ -68,15 +79,24 @@
 >
   <!-- Thumbnail -->
   <div class="relative flex-shrink-0">
-    {#if video.thumbnailUrl}
+    {#if displayThumbUrl}
       <img
-        src={video.thumbnailUrl}
+        src={displayThumbUrl}
         alt=""
-        class={cn('h-12 w-16 object-cover bg-muted', isWatched && !isActive && 'opacity-50')}
+        class={cn(
+          'object-cover bg-muted',
+          listThumbnailAsAvatar ? 'h-12 w-12 rounded-full' : 'h-12 w-16',
+          isWatched && !isActive && 'opacity-50'
+        )}
         loading="lazy"
       />
     {:else}
-      <div class="h-12 w-16 bg-muted flex items-center justify-center">
+      <div
+        class={cn(
+          'bg-muted flex items-center justify-center',
+          listThumbnailAsAvatar ? 'h-12 w-12 rounded-full' : 'h-12 w-16'
+        )}
+      >
         <span class="text-muted-foreground text-xs">▶</span>
       </div>
     {/if}
