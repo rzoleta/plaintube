@@ -134,7 +134,7 @@
 	.wordmark {
 		font-family: 'IBM Plex Mono', monospace;
 		font-weight: 600;
-		font-size: 1.25rem;
+		font-size: 1.3rem;
 		letter-spacing: -0.01em;
 		color: #111;
 	}
@@ -145,7 +145,7 @@
 
 	.version {
 		font-family: 'IBM Plex Mono', monospace;
-		font-size: 0.65rem;
+		font-size: 0.68rem;
 		font-weight: 400;
 		color: #999;
 		letter-spacing: 0.02em;
@@ -160,7 +160,7 @@
 	}
 
 	.tagline {
-		font-size: 1.35rem;
+		font-size: 1.4rem;
 		font-weight: 500;
 		line-height: 1.45;
 		color: #111;
@@ -188,7 +188,7 @@
 	}
 
 	.features li {
-		font-size: 0.78rem;
+		font-size: 0.82rem;
 		color: #555;
 		display: flex;
 		gap: 0.4rem;
@@ -217,7 +217,7 @@
 		color: #fff;
 		border: none;
 		font-family: 'IBM Plex Sans', system-ui, sans-serif;
-		font-size: 0.875rem;
+		font-size: 0.9rem;
 		font-weight: 500;
 		cursor: pointer;
 		transition: background 0.15s ease;
@@ -244,7 +244,7 @@
 	/* ── Privacy note ── */
 	.privacy-note {
 		margin: 0;
-		font-size: 0.7rem;
+		font-size: 0.73rem;
 		color: #999;
 		text-align: center;
 		line-height: 1.5;
@@ -275,7 +275,7 @@
 	}
 
 	.footer-link {
-		font-size: 0.7rem;
+		font-size: 0.73rem;
 		color: #999;
 		text-decoration: none;
 		transition: color 0.15s ease;

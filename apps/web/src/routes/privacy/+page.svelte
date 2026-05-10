@@ -103,7 +103,7 @@
 	.wordmark {
 		font-family: 'IBM Plex Mono', monospace;
 		font-weight: 600;
-		font-size: 1rem;
+		font-size: 1.04rem;
 		color: #111;
 	}
 
@@ -111,7 +111,7 @@
 
 	.back {
 		font-family: 'IBM Plex Mono', monospace;
-		font-size: 0.65rem;
+		font-size: 0.68rem;
 		color: #999;
 		text-decoration: none;
 		transition: color 0.15s;
@@ -128,7 +128,7 @@
 
 	.lede {
 		margin: 0;
-		font-size: 0.9rem;
+		font-size: 0.94rem;
 		color: #555;
 		border-left: 2px solid #0078d4;
 		padding-left: 0.875rem;
@@ -146,7 +146,7 @@
 	h2 {
 		margin: 0;
 		font-family: 'IBM Plex Mono', monospace;
-		font-size: 0.72rem;
+		font-size: 0.75rem;
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
@@ -155,7 +155,7 @@
 
 	p {
 		margin: 0;
-		font-size: 0.82rem;
+		font-size: 0.85rem;
 		color: #333;
 		line-height: 1.65;
 	}
@@ -164,7 +164,7 @@
 
 	code {
 		font-family: 'IBM Plex Mono', monospace;
-		font-size: 0.78rem;
+		font-size: 0.81rem;
 		background: #f0f0f0;
 		padding: 0.1em 0.35em;
 		border-radius: 2px;
@@ -177,7 +177,7 @@
 
 	.meta {
 		color: #999 !important;
-		font-size: 0.72rem !important;
+		font-size: 0.75rem !important;
 	}
 
 	footer {
@@ -196,7 +196,7 @@
 
 	.footer-link {
 		font-family: 'IBM Plex Mono', monospace;
-		font-size: 0.7rem;
+		font-size: 0.73rem;
 		color: #999;
 		text-decoration: none;
 		transition: color 0.15s;
