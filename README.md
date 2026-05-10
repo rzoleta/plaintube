@@ -1,10 +1,8 @@
-# PlainTube
+# ▶️ PlainTube
 
 **Your YouTube subscriptions, in order—without the home feed, recommendations, or extra noise.**
 
 PlainTube is a free, open-source web app that turns the channels you follow into a simple **inbox**: newest videos first, like an email client instead of a social feed. Videos still play through **YouTube’s own player**; PlainTube is a calmer way to catch up, not a replacement for YouTube itself.
-
----
 
 ## Try it
 
@@ -31,7 +29,6 @@ If a public instance is available, open **[plaintube.tv](https://plaintube.tv)**
 | **E** | Archive or unarchive the current video |
 | **S** | Save or remove from Saved |
 
----
 
 ## Privacy in plain language
 
@@ -41,8 +38,6 @@ If a public instance is available, open **[plaintube.tv](https://plaintube.tv)**
 - **Playback** — Watching a video uses YouTube’s embedded player, so YouTube’s normal rules and policies apply there.  
 
 For the detailed policy, see the **Privacy** link on the app (e.g. [plaintube.tv/privacy](https://plaintube.tv/privacy)).
-
----
 
 ## For developers
 
