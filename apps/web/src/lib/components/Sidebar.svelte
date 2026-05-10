@@ -4,7 +4,8 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import DarkModeToggle from '$lib/components/ui/dark-mode-toggle/DarkModeToggle.svelte';
-	import { ChevronDown, ChevronRight, LogOut } from 'lucide-svelte';
+	import { ChevronDown, ChevronRight, LogOut, Inbox, Archive, Bookmark } from 'lucide-svelte';
+	import type { Component } from 'svelte';
 	import { cn } from '$lib/utils.js';
 
 	interface Props {
@@ -56,10 +57,10 @@
 		staleTime: 1000 * 60 * 30
 	});
 
-	const mainSections = [
-		{ id: 'inbox', label: 'Inbox' },
-		{ id: 'watched', label: 'Archived' },
-		{ id: 'saved', label: 'Saved' }
+	const mainSections: { id: string; label: string; icon: Component }[] = [
+		{ id: 'inbox', label: 'Inbox', icon: Inbox },
+		{ id: 'watched', label: 'Archived', icon: Archive },
+		{ id: 'saved', label: 'Saved', icon: Bookmark }
 	];
 
 	function isActive(section: string): boolean {
@@ -80,9 +81,10 @@
 			<Button
 				variant={isActive(section.id) ? 'default' : 'ghost'}
 				size="sm"
-				class="w-full justify-start text-xs h-7"
+				class="w-full justify-start text-xs h-7 gap-2"
 				onclick={() => onSelectSection(section.id)}
 			>
+				<section.icon class="h-3.5 w-3.5 shrink-0" />
 				{section.label}
 			</Button>
 		{/each}
