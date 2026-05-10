@@ -8,7 +8,7 @@
 </script>
 
 <div
-	class={cn('bg-card text-card-foreground rounded-xl border shadow', className)}
+	class={cn('bg-card text-card-foreground rounded-xl border', className)}
 	{...restProps}
 >
 	{@render children?.()}
