@@ -2,6 +2,7 @@
   "name": "plaintube",
   "private": true,
   "version": "0.0.1",
+  "packageManager": "pnpm@10.14.0",
   "scripts": {
     "build": "pnpm --filter web build",
     "dev": "pnpm --filter web dev",
