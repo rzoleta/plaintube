@@ -60,44 +60,45 @@
 
 		<!-- Video metadata & actions -->
 		<div class="flex-1 overflow-y-auto scrollbar-thin p-4">
-			<!-- Title -->
-			<h1 class="text-base font-semibold leading-snug text-foreground">
-				{video.title}
-			</h1>
+			<!-- Title + buttons row -->
+			<div class="flex items-start justify-between gap-3">
+				<div class="min-w-0">
+					<h1 class="text-base font-semibold leading-snug text-foreground">
+						{video.title}
+					</h1>
+					<p class="mt-1 text-sm text-muted-foreground">
+						{video.channelTitle}
+						<span class="mx-1 text-muted-foreground/40">·</span>
+						{formatDate(video.publishedAt)}
+					</p>
+				</div>
 
-			<!-- Channel & date -->
-			<p class="mt-1 text-sm text-muted-foreground">
-				{video.channelTitle}
-				<span class="mx-1 text-muted-foreground/40">·</span>
-				{formatDate(video.publishedAt)}
-			</p>
+				<div class="flex shrink-0 gap-2 pt-0.5">
+					<Button
+						variant={isWatched ? 'default' : 'outline'}
+						size="sm"
+						class="gap-1.5 text-xs h-8"
+						onclick={handleMarkWatched}
+					>
+						<Archive class="h-3.5 w-3.5" />
+						{isWatched ? 'Unarchive' : 'Archive'}
+					</Button>
 
-			<!-- Action buttons -->
-			<div class="mt-3 flex gap-2">
-				<Button
-					variant={isWatched ? 'default' : 'outline'}
-					size="sm"
-					class="gap-1.5 text-xs h-8"
-					onclick={handleMarkWatched}
-				>
-					<Archive class="h-3.5 w-3.5" />
-					{isWatched ? 'Unarchive' : 'Archive'}
-				</Button>
-
-				<Button
-					variant={isSaved ? 'secondary' : 'outline'}
-					size="sm"
-					class="gap-1.5 text-xs h-8"
-					onclick={handleSaveToggle}
-				>
-					{#if isSaved}
-						<BookmarkCheck class="h-3.5 w-3.5" />
-						Saved
-					{:else}
-						<Bookmark class="h-3.5 w-3.5" />
-						Save
-					{/if}
-				</Button>
+					<Button
+						variant={isSaved ? 'secondary' : 'outline'}
+						size="sm"
+						class="gap-1.5 text-xs h-8"
+						onclick={handleSaveToggle}
+					>
+						{#if isSaved}
+							<BookmarkCheck class="h-3.5 w-3.5" />
+							Saved
+						{:else}
+							<Bookmark class="h-3.5 w-3.5" />
+							Save
+						{/if}
+					</Button>
+				</div>
 			</div>
 
 			<!-- Description -->
