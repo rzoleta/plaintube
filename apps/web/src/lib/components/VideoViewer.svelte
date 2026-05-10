@@ -4,7 +4,7 @@
 	import { savedVideos, saveVideo, unsaveVideo } from '$lib/stores/saved';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { Check, Bookmark, BookmarkCheck } from 'lucide-svelte';
+	import { Archive, Bookmark, BookmarkCheck } from 'lucide-svelte';
 
 	interface Props {
 		video: VideoItem | null;
@@ -80,7 +80,7 @@
 					class="gap-1.5 text-xs h-8"
 					onclick={handleMarkWatched}
 				>
-					<Check class="h-3.5 w-3.5" />
+					<Archive class="h-3.5 w-3.5" />
 					{isWatched ? 'Unarchive' : 'Archive'}
 				</Button>
 
