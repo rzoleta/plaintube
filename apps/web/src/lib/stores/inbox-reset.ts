@@ -34,3 +34,9 @@ export function resetInbox(): void {
   _store.set(iso);
   persist(iso);
 }
+
+/** Removes the cutoff; inbox shows all unwatched items again (sidebar ∞). */
+export function clearInboxReset(): void {
+  _store.set(null);
+  persist(null);
+}

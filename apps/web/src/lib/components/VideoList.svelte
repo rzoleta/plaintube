@@ -5,7 +5,7 @@
 	import type { VideoItem, PaginatedVideos, Subscription } from '$lib/api/youtube';
 	import { watchedIds } from '$lib/stores/watched';
 	import { savedVideos } from '$lib/stores/saved';
-	import { inboxResetAt, resetInbox } from '$lib/stores/inbox-reset';
+	import { inboxResetAt, resetInbox, clearInboxReset } from '$lib/stores/inbox-reset';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { PanelLeftClose } from 'lucide-svelte';
@@ -304,6 +304,12 @@
 		onInboxReset?.();
 		resetDialogOpen = false;
 	}
+
+	function handleUndoInboxReset() {
+		clearInboxReset();
+		toast.success('Inbox filter cleared');
+		resetDialogOpen = false;
+	}
 </script>
 
 <section class="flex h-full flex-col border-r border-border overflow-hidden bg-background">
@@ -412,13 +418,22 @@
 					</p>
 				{/if}
 			</Dialog.Header>
-			<Dialog.Footer>
-				<Button variant="outline" size="sm" class="text-xs h-8" onclick={() => (resetDialogOpen = false)}>
-					Cancel
-				</Button>
-				<Button variant="default" size="sm" class="text-xs h-8" onclick={confirmResetInbox}>
-					Reset inbox
-				</Button>
+			<Dialog.Footer
+				class="w-full flex-row flex-wrap items-center justify-start gap-2 sm:flex-row sm:justify-start"
+			>
+				{#if lastResetFormatted}
+					<Button variant="outline" size="sm" class="text-xs h-8" onclick={handleUndoInboxReset}>
+						Undo
+					</Button>
+				{/if}
+				<div class="ml-auto flex items-center gap-2">
+					<Button variant="outline" size="sm" class="text-xs h-8" onclick={() => (resetDialogOpen = false)}>
+						Cancel
+					</Button>
+					<Button variant="default" size="sm" class="text-xs h-8" onclick={confirmResetInbox}>
+						Reset inbox
+					</Button>
+				</div>
 			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Portal>
