@@ -245,6 +245,29 @@ export async function getPlaylistVideos(
 }
 
 /**
+ * Get the publishedAt of the most recently added item in a playlist (position 0).
+ * Returns null if the playlist is empty or the call fails.
+ */
+export async function getPlaylistLastActivity(
+	playlistId: string,
+	accessToken: string
+): Promise<string | null> {
+	interface YTPlaylistItemList {
+		items?: Array<{ snippet: { publishedAt: string } }>;
+	}
+	try {
+		const data = await ytFetch<YTPlaylistItemList>(
+			'playlistItems',
+			{ part: 'snippet', playlistId, maxResults: '1' },
+			accessToken
+		);
+		return data.items?.[0]?.snippet.publishedAt ?? null;
+	} catch {
+		return null;
+	}
+}
+
+/**
  * Get all playlists for the authenticated user.
  */
 export async function getUserPlaylists(
