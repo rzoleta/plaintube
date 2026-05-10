@@ -16,6 +16,7 @@
     "@auth/core": "^0.37.4",
     "@auth/sveltekit": "^1.7.4",
     "@tanstack/svelte-query": "^5.62.16",
+    "@vercel/analytics": "^2.0.1",
     "bits-ui": "^2.18.1",
     "clsx": "^2.1.1",
     "esbuild": "^0.28.0",
