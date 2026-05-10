@@ -129,7 +129,7 @@
 
 				<div class="flex shrink-0 gap-2 pt-0.5">
 					<Button
-						variant={isWatched ? 'default' : 'outline'}
+						variant={isWatched ? 'secondary' : 'outline'}
 						size="sm"
 						class="gap-1.5 text-xs h-8"
 						onclick={handleMarkWatched}
