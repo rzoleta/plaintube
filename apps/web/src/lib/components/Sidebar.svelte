@@ -59,8 +59,8 @@
 
 	const mainSections: { id: string; label: string; icon: Component }[] = [
 		{ id: 'inbox', label: 'Inbox', icon: Inbox },
-		{ id: 'watched', label: 'Archived', icon: Archive },
-		{ id: 'saved', label: 'Saved', icon: Bookmark }
+		{ id: 'saved', label: 'Saved', icon: Bookmark },
+		{ id: 'watched', label: 'Archived', icon: Archive }
 	];
 
 	function isActive(section: string): boolean {
