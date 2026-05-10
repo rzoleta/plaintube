@@ -1,9 +1,13 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { browser } from '$app/environment';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import VideoList from '$lib/components/VideoList.svelte';
 	import VideoViewer from '$lib/components/VideoViewer.svelte';
 	import type { VideoItem } from '$lib/api/youtube';
+	import { watchedIds, markWatched, unmarkWatched } from '$lib/stores/watched';
+	import { savedVideos, saveVideo, unsaveVideo } from '$lib/stores/saved';
+	import { toast } from 'svelte-sonner';
 	import { signOut } from '@auth/sveltekit/client';
 	import { PanelLeftOpen } from 'lucide-svelte';
 
@@ -18,6 +22,8 @@
 	let activePlaylistTitle = $state<string | null>(null);
 	let selectedVideo = $state<VideoItem | null>(null);
 	let sidebarHidden = $state<boolean>(false);
+	/** Mirrors VideoList ordering for archive → select-next and shortcuts (stale while sidebar/list hidden). */
+	let orderedVideos = $state<VideoItem[]>([]);
 
 	function toggleSidebar() {
 		sidebarHidden = !sidebarHidden;
@@ -56,6 +62,66 @@
 		selectedVideo = video;
 	}
 
+	function handleOrderedVideosChange(videos: VideoItem[]) {
+		orderedVideos = videos;
+	}
+
+	function handleArchive(video: VideoItem) {
+		if ($watchedIds.has(video.videoId)) {
+			unmarkWatched(video.videoId);
+			return;
+		}
+		const list = orderedVideos;
+		const idx = list.findIndex((x) => x.videoId === video.videoId);
+		const next =
+			idx >= 0 && idx + 1 < list.length ? (list[idx + 1] ?? null) : null;
+		markWatched(video.videoId);
+		toast.success('Archived');
+		if (selectedVideo?.videoId === video.videoId) {
+			selectedVideo = next;
+		}
+	}
+
+	function handleSaveToggle(video: VideoItem) {
+		const saved = $savedVideos.some((x) => x.videoId === video.videoId);
+		if (saved) unsaveVideo(video.videoId);
+		else saveVideo(video);
+	}
+
+	function isTypingTarget(target: EventTarget | null): boolean {
+		if (!target || !(target instanceof HTMLElement)) return false;
+		const tag = target.tagName;
+		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+		return target.isContentEditable;
+	}
+
+	$effect(() => {
+		if (!browser) return;
+
+		function onKeydown(e: KeyboardEvent) {
+			if (e.defaultPrevented) return;
+			if (e.metaKey || e.ctrlKey || e.altKey) return;
+			if (isTypingTarget(e.target)) return;
+
+			const v = selectedVideo;
+			if (!v) return;
+
+			const k = e.key;
+			if (k === 'e' || k === 'E') {
+				e.preventDefault();
+				handleArchive(v);
+				return;
+			}
+			if (k === 's' || k === 'S') {
+				e.preventDefault();
+				handleSaveToggle(v);
+			}
+		}
+
+		window.addEventListener('keydown', onKeydown);
+		return () => window.removeEventListener('keydown', onKeydown);
+	});
+
 	async function handleSignOut() {
 		await signOut({ callbackUrl: '/login' });
 	}
@@ -87,11 +153,18 @@
 			selectedVideoId={selectedVideo?.videoId ?? null}
 			onSelectVideo={handleSelectVideo}
 			onToggleSidebar={toggleSidebar}
+			onOrderedVideosChange={handleOrderedVideosChange}
+			onArchiveVideo={handleArchive}
+			onSaveToggleVideo={handleSaveToggle}
 		/>
 	{/if}
 
 	<!-- Column 3: Video Viewer -->
-	<VideoViewer video={selectedVideo} />
+	<VideoViewer
+		video={selectedVideo}
+		onArchive={handleArchive}
+		onSaveToggle={handleSaveToggle}
+	/>
 
 	{#if sidebarHidden}
 		<button

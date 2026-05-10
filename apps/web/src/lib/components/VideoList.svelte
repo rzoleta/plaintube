@@ -17,6 +17,10 @@
 		selectedVideoId: string | null;
 		onSelectVideo: (video: VideoItem) => void;
 		onToggleSidebar?: () => void;
+		/** Called when the visible ordered list changes (for selection advance / shortcuts). */
+		onOrderedVideosChange?: (videos: VideoItem[]) => void;
+		onArchiveVideo: (video: VideoItem) => void;
+		onSaveToggleVideo: (video: VideoItem) => void;
 	}
 
 	const {
@@ -27,7 +31,10 @@
 		activePlaylistTitle,
 		selectedVideoId,
 		onSelectVideo,
-		onToggleSidebar
+		onToggleSidebar,
+		onOrderedVideosChange,
+		onArchiveVideo,
+		onSaveToggleVideo
 	}: Props = $props();
 
 	// Reactive props as stores for TanStack Query options
@@ -211,6 +218,10 @@
 		}
 	});
 
+	$effect(() => {
+		onOrderedVideosChange?.(finalVideos());
+	});
+
 	const isLoading = $derived(
 		activeChannelId
 			? $channelVideosQuery.isLoading
@@ -305,6 +316,8 @@
 					{video}
 					isActive={selectedVideoId === video.videoId}
 					onClick={onSelectVideo}
+					onArchive={onArchiveVideo}
+					onSaveToggle={onSaveToggleVideo}
 					listThumbnailUrl={channelListThumbnail(video)}
 					listThumbnailAsAvatar={useChannelThumbnailInList}
 				/>

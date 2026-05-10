@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { VideoItem } from '$lib/api/youtube';
-  import { watchedIds, markWatched, unmarkWatched } from '$lib/stores/watched';
-  import { savedVideos, saveVideo, unsaveVideo } from '$lib/stores/saved';
+  import { watchedIds } from '$lib/stores/watched';
+  import { savedVideos } from '$lib/stores/saved';
   import { Badge } from '$lib/components/ui/badge/index.js';
   import { cn } from '$lib/utils.js';
   import { Archive, Bookmark, BookmarkCheck } from 'lucide-svelte';
@@ -10,6 +10,8 @@
     video: VideoItem;
     isActive: boolean;
     onClick: (video: VideoItem) => void;
+    onArchive: (video: VideoItem) => void;
+    onSaveToggle: (video: VideoItem) => void;
     /** When set, shown instead of the video thumbnail (e.g. channel avatar). */
     listThumbnailUrl?: string;
     /** Circular square crop (channel-style) vs 16×12 video poster. */
@@ -20,6 +22,8 @@
     video,
     isActive,
     onClick,
+    onArchive,
+    onSaveToggle,
     listThumbnailUrl,
     listThumbnailAsAvatar = false
   }: Props = $props();
@@ -45,21 +49,38 @@
     return `${diffYr}y ago`;
   }
 
+  /** Calendar date when older than strictly 7 days (list badge readability). */
+  function formatPublishedDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const sameYear = date.getFullYear() === now.getFullYear();
+    return date.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      ...(sameYear ? {} : { year: 'numeric' as const })
+    });
+  }
+
+  const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
   const isWatched = $derived($watchedIds.has(video.videoId));
   const isSaved = $derived($savedVideos.some((v) => v.videoId === video.videoId));
-  const relativeTime = $derived(formatRelativeTime(video.publishedAt));
+  const publishedBadgeLabel = $derived.by(() => {
+    const published = new Date(video.publishedAt);
+    const diffMs = Date.now() - published.getTime();
+    if (diffMs > SEVEN_DAYS_MS) return formatPublishedDate(video.publishedAt);
+    return formatRelativeTime(video.publishedAt);
+  });
   const displayThumbUrl = $derived(listThumbnailUrl ?? video.thumbnailUrl);
 
   function handleArchive(e: MouseEvent) {
     e.stopPropagation();
-    if (isWatched) unmarkWatched(video.videoId);
-    else markWatched(video.videoId);
+    onArchive(video);
   }
 
   function handleSave(e: MouseEvent) {
     e.stopPropagation();
-    if (isSaved) unsaveVideo(video.videoId);
-    else saveVideo(video);
+    onSaveToggle(video);
   }
 </script>
 
@@ -127,7 +148,7 @@
         variant="outline"
         class="text-[10px] px-1 py-0 h-4 font-normal"
       >
-        {relativeTime}
+        {publishedBadgeLabel}
       </Badge>
     </div>
   </div>

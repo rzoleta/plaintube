@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { VideoItem } from '$lib/api/youtube';
-	import { watchedIds, markWatched, unmarkWatched } from '$lib/stores/watched';
-	import { savedVideos, saveVideo, unsaveVideo } from '$lib/stores/saved';
+	import { watchedIds } from '$lib/stores/watched';
+	import { savedVideos } from '$lib/stores/saved';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Archive, Bookmark, BookmarkCheck } from 'lucide-svelte';
@@ -10,9 +10,11 @@
 
 	interface Props {
 		video: VideoItem | null;
+		onArchive: (video: VideoItem) => void;
+		onSaveToggle: (video: VideoItem) => void;
 	}
 
-	const { video }: Props = $props();
+	const { video, onArchive, onSaveToggle }: Props = $props();
 
 	const isWatched = $derived(video ? $watchedIds.has(video.videoId) : false);
 	const isSaved = $derived(video ? $savedVideos.some((v) => v.videoId === video!.videoId) : false);
@@ -27,14 +29,12 @@
 
 	function handleMarkWatched() {
 		if (!video) return;
-		if (isWatched) unmarkWatched(video.videoId);
-		else markWatched(video.videoId);
+		onArchive(video);
 	}
 
 	function handleSaveToggle() {
 		if (!video) return;
-		if (isSaved) unsaveVideo(video.videoId);
-		else saveVideo(video);
+		onSaveToggle(video);
 	}
 
 	// Reactive store for the current channelId so TanStack Query can react to changes

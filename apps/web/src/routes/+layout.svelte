@@ -2,6 +2,7 @@
 	import '../app.css';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import { ModeWatcher } from 'mode-watcher';
+	import { Toaster } from '$lib/components/ui/sonner/index.js';
 
 	const { children } = $props();
 
@@ -16,6 +17,7 @@
 </script>
 
 <ModeWatcher />
+<Toaster />
 <QueryClientProvider client={queryClient}>
 	{@render children()}
 </QueryClientProvider>
