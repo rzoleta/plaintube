@@ -4,14 +4,14 @@
 
 @layer base {
 	:root {
-		/* light: white bg, zinc text, #0078d4 primary, blue-50 accent hover */
+		/* light: white bg, zinc text, #1d4ed8 primary, blue-50 accent hover */
 		--background: 0 0% 100%;
 		--foreground: 240 10% 3.9%;        /* zinc-950 */
 		--card: 0 0% 100%;
 		--card-foreground: 240 10% 3.9%;
 		--popover: 0 0% 100%;
 		--popover-foreground: 240 10% 3.9%;
-		--primary: 206 100% 41%;           /* #0078d4 */
+		--primary: 224 76% 48%;            /* #1d4ed8 blue-700 */
 		--primary-foreground: 0 0% 98%;
 		--secondary: 240 4.8% 95.9%;      /* zinc-100 */
 		--secondary-foreground: 240 5.9% 10%;
@@ -23,7 +23,7 @@
 		--destructive-foreground: 0 0% 98%;
 		--border: 240 5.9% 90%;            /* zinc-200 */
 		--input: 240 5.9% 90%;
-		--ring: 206 100% 41%;
+		--ring: 224 76% 48%;
 		--radius: 0.375rem;
 	}
 
@@ -35,7 +35,7 @@
 		--card-foreground: 0 0% 98%;
 		--popover: 240 5.9% 10%;
 		--popover-foreground: 0 0% 98%;
-		--primary: 217 91% 60%;            /* blue-500 — brighter on dark */
+		--primary: 221 83% 37%;            /* #1e40af blue-800 */
 		--primary-foreground: 0 0% 98%;
 		--secondary: 240 3.7% 15.9%;      /* zinc-800 */
 		--secondary-foreground: 0 0% 98%;
@@ -47,7 +47,7 @@
 		--destructive-foreground: 0 0% 98%;
 		--border: 240 3.7% 15.9%;         /* zinc-800 */
 		--input: 240 3.7% 15.9%;
-		--ring: 217 91% 60%;
+		--ring: 221 83% 37%;
 	}
 
 	* {
