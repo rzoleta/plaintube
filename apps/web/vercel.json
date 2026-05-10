@@ -1,5 +1,6 @@
 {
 	"buildCommand": "pnpm build",
 	"outputDirectory": ".vercel/output",
-	"framework": "sveltekit"
+	"framework": "sveltekit",
+	"installCommand": "cd ../.. && npx pnpm@10.14.0 install --frozen-lockfile"
 }
