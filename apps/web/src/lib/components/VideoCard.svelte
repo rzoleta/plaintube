@@ -121,7 +121,7 @@
 	<!-- Hover action buttons -->
 	<div
 		class={cn(
-			'absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity',
+			'absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity',
 			isActive && 'opacity-0 group-hover:opacity-100'
 		)}
 	>
