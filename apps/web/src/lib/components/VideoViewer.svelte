@@ -81,7 +81,7 @@
 					onclick={handleMarkWatched}
 				>
 					<Check class="h-3.5 w-3.5" />
-					{isWatched ? 'Watched' : 'Mark as Watched'}
+					{isWatched ? 'Unarchive' : 'Archive'}
 				</Button>
 
 				<Button

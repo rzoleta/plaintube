@@ -58,7 +58,7 @@
 
 	const mainSections = [
 		{ id: 'inbox', label: 'Inbox' },
-		{ id: 'watched', label: 'Watched' },
+		{ id: 'watched', label: 'Archived' },
 		{ id: 'saved', label: 'Saved' }
 	];
 

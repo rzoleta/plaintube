@@ -148,7 +148,7 @@
 				: activeSection === 'inbox'
 					? 'Inbox'
 					: activeSection === 'watched'
-						? 'Watched'
+						? 'Archived'
 						: activeSection === 'saved'
 							? 'Saved'
 							: ''
@@ -241,8 +241,8 @@
 				{#if activeSection === 'inbox' && !activeChannelId && !activePlaylistId}
 					<p class="text-xs">Select a channel from the sidebar to load its videos.</p>
 				{:else if activeSection === 'watched'}
-					<p class="text-xs">No watched videos yet.</p>
-					<p class="text-xs text-muted-foreground/60">Watch videos and mark them as watched.</p>
+					<p class="text-xs">No archived videos yet.</p>
+					<p class="text-xs text-muted-foreground/60">Archive videos to remove them from your inbox.</p>
 				{:else if activeSection === 'saved'}
 					<p class="text-xs">No saved videos yet.</p>
 					<p class="text-xs text-muted-foreground/60">Save videos to watch later.</p>
