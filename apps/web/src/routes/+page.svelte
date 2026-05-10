@@ -10,6 +10,7 @@
 	import { toast } from 'svelte-sonner';
 	import { signOut } from '@auth/sveltekit/client';
 	import { PanelLeftOpen } from 'lucide-svelte';
+	import { maybeTrackSignUp } from '$lib/analytics/maybe-track-sign-up';
 
 	const { data }: { data: PageData } = $props();
 
@@ -101,6 +102,12 @@
 		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
 		return target.isContentEditable;
 	}
+
+	$effect(() => {
+		if (!browser) return;
+		const s = data.session;
+		if (s) maybeTrackSignUp(s);
+	});
 
 	$effect(() => {
 		if (!browser) return;
