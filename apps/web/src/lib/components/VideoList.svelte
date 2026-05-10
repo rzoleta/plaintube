@@ -5,8 +5,11 @@
 	import type { VideoItem, PaginatedVideos, Subscription } from '$lib/api/youtube';
 	import { watchedIds } from '$lib/stores/watched';
 	import { savedVideos } from '$lib/stores/saved';
+	import { inboxResetAt, resetInbox } from '$lib/stores/inbox-reset';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { PanelLeftClose } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
 
 	interface Props {
 		activeSection: string;
@@ -17,6 +20,8 @@
 		selectedVideoId: string | null;
 		onSelectVideo: (video: VideoItem) => void;
 		onToggleSidebar?: () => void;
+		/** After inbox reset, parent can clear selection for videos no longer in the list. */
+		onInboxReset?: () => void;
 		/** Called when the visible ordered list changes (for selection advance / shortcuts). */
 		onOrderedVideosChange?: (videos: VideoItem[]) => void;
 		onArchiveVideo: (video: VideoItem) => void;
@@ -32,10 +37,19 @@
 		selectedVideoId,
 		onSelectVideo,
 		onToggleSidebar,
+		onInboxReset,
 		onOrderedVideosChange,
 		onArchiveVideo,
 		onSaveToggleVideo
 	}: Props = $props();
+
+	let resetDialogOpen = $state(false);
+
+	$effect(() => {
+		if (activeSection !== 'inbox' || activeChannelId || activePlaylistId) {
+			resetDialogOpen = false;
+		}
+	});
 
 	// Reactive props as stores for TanStack Query options
 	function reactiveStore<T>(getter: () => T) {
@@ -123,8 +137,8 @@
 	// ─── Inbox query (all subscribed channels merged) ────────────────────────
 
 	const inboxOptions = derived(
-		[sectionStore, channelIdStore, playlistIdStore],
-		([$section, $channelId, $playlistId]) => ({
+		[sectionStore, channelIdStore, playlistIdStore, inboxResetAt],
+		([$section, $channelId, $playlistId, $reset]) => ({
 			queryKey: ['inbox'] as const,
 			queryFn: async () => {
 				const res = await fetch('/api/inbox');
@@ -132,7 +146,7 @@
 				return res.json() as Promise<PaginatedVideos>;
 			},
 			staleTime: 1000 * 60 * 10, // 10 min — inbox is expensive to fetch
-			enabled: $section === 'inbox' && !$channelId && !$playlistId
+			enabled: !$channelId && !$playlistId && ($section === 'inbox' || $reset != null)
 		})
 	);
 
@@ -207,8 +221,15 @@
 		}
 		if (activePlaylistId) return allPlaylistVideos;
 		switch (activeSection) {
-			case 'inbox':
-				return ($inboxQuery.data?.items ?? []).filter((v) => !$watchedIds.has(v.videoId));
+			case 'inbox': {
+				let items = ($inboxQuery.data?.items ?? []).filter((v) => !$watchedIds.has(v.videoId));
+				const cutoff = $inboxResetAt;
+				if (cutoff) {
+					const t = new Date(cutoff).getTime();
+					items = items.filter((v) => new Date(v.publishedAt).getTime() > t);
+				}
+				return items;
+			}
 			case 'watched':
 				return $savedVideos.filter((v) => $watchedIds.has(v.videoId));
 			case 'saved':
@@ -265,23 +286,53 @@
 			void $playlistVideosQuery.fetchNextPage();
 		}
 	}
+
+	const lastResetFormatted = $derived.by(() => {
+		const raw = $inboxResetAt;
+		if (!raw) return null;
+		const d = new Date(raw);
+		if (Number.isNaN(d.getTime())) return null;
+		return new Intl.DateTimeFormat(undefined, {
+			dateStyle: 'medium',
+			timeStyle: 'short'
+		}).format(d);
+	});
+
+	function confirmResetInbox() {
+		resetInbox();
+		toast.success('Inbox reset');
+		onInboxReset?.();
+		resetDialogOpen = false;
+	}
 </script>
 
 <section class="flex h-full flex-col border-r border-border overflow-hidden bg-background">
 	<!-- Section header -->
 	<div class="border-b border-border bg-card px-3 py-2 flex-shrink-0 flex items-center justify-between gap-2">
 		<h2 class="text-sm font-semibold text-foreground truncate">{sectionTitle}</h2>
-		{#if onToggleSidebar}
-			<button
-				type="button"
-				onclick={onToggleSidebar}
-				class="shrink-0 inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-background/80 transition-colors"
-				title="Hide sidebar"
-				aria-label="Hide sidebar"
-			>
-				<PanelLeftClose class="h-4 w-4" />
-			</button>
-		{/if}
+		<div class="flex shrink-0 items-center gap-1">
+			{#if activeSection === 'inbox' && !activeChannelId && !activePlaylistId}
+				<Button
+					variant="outline"
+					size="sm"
+					class="text-xs h-7 px-2"
+					onclick={() => (resetDialogOpen = true)}
+				>
+					Reset Inbox
+				</Button>
+			{/if}
+			{#if onToggleSidebar}
+				<button
+					type="button"
+					onclick={onToggleSidebar}
+					class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-background/80 transition-colors"
+					title="Hide sidebar"
+					aria-label="Hide sidebar"
+				>
+					<PanelLeftClose class="h-4 w-4" />
+				</button>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Video list -->
@@ -299,7 +350,11 @@
 				class="flex flex-col items-center justify-center py-12 text-sm text-muted-foreground gap-1 px-4 text-center"
 			>
 				{#if activeSection === 'inbox' && !activeChannelId && !activePlaylistId}
-					<p class="text-xs">Select a channel from the sidebar to load its videos.</p>
+					<p class="text-xs">
+						{$inboxResetAt
+							? 'No new videos since you reset the inbox.'
+							: 'No unwatched videos from your subscriptions.'}
+					</p>
 				{:else if activeSection === 'watched'}
 					<p class="text-xs">No archived videos yet.</p>
 					<p class="text-xs text-muted-foreground/60">Archive videos to remove them from your inbox.</p>
@@ -340,3 +395,31 @@
 		{/if}
 	</div>
 </section>
+
+<Dialog.Root bind:open={resetDialogOpen}>
+	<Dialog.Portal>
+		<Dialog.Overlay />
+		<Dialog.Content class="sm:max-w-md">
+			<Dialog.Header>
+				<Dialog.Title>Reset inbox?</Dialog.Title>
+				<Dialog.Description>
+					Videos published before now will be hidden from the inbox. Only newer uploads will appear here
+					until you reset again.
+				</Dialog.Description>
+				{#if lastResetFormatted}
+					<p class="text-xs text-foreground/70">
+						Last reset on {lastResetFormatted}
+					</p>
+				{/if}
+			</Dialog.Header>
+			<Dialog.Footer>
+				<Button variant="outline" size="sm" class="text-xs h-8" onclick={() => (resetDialogOpen = false)}>
+					Cancel
+				</Button>
+				<Button variant="default" size="sm" class="text-xs h-8" onclick={confirmResetInbox}>
+					Reset inbox
+				</Button>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>

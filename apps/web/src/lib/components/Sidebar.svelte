@@ -6,8 +6,12 @@
 	import DarkModeToggle from '$lib/components/ui/dark-mode-toggle/DarkModeToggle.svelte';
 	import { ChevronDown, ChevronRight, LogOut, Inbox, Archive, Bookmark } from 'lucide-svelte';
 	import type { Component } from 'svelte';
+	import { derived } from 'svelte/store';
 	import { cn } from '$lib/utils.js';
 	import { savedVideos } from '$lib/stores/saved';
+	import { inboxResetAt } from '$lib/stores/inbox-reset';
+	import { watchedIds } from '$lib/stores/watched';
+	import type { PaginatedVideos } from '$lib/api/youtube';
 
 	interface Props {
 		activeSection: string;
@@ -58,6 +62,35 @@
 		staleTime: 1000 * 60 * 30
 	});
 
+	const inboxBadgeQueryOptions = derived(inboxResetAt, ($reset) => ({
+		queryKey: ['inbox'] as const,
+		queryFn: async () => {
+			const res = await fetch('/api/inbox');
+			if (!res.ok) throw new Error(await res.text());
+			return res.json() as Promise<PaginatedVideos>;
+		},
+		staleTime: 1000 * 60 * 10,
+		enabled: $reset != null && $reset.length > 0
+	}));
+
+	const inboxBadgeQuery = createQuery<PaginatedVideos, Error, PaginatedVideos, readonly string[]>(
+		inboxBadgeQueryOptions
+	);
+
+	const inboxNavBadge = $derived.by(() => {
+		if ($inboxResetAt == null) return { kind: 'infinity' as const };
+		const q = $inboxBadgeQuery;
+		if (q.isError) return { kind: 'count' as const, n: 0 };
+		if (q.isLoading) return { kind: 'loading' as const };
+		const data = q.data;
+		if (!data) return { kind: 'loading' as const };
+		const t = new Date($inboxResetAt).getTime();
+		const n = data.items.filter(
+			(v) => !$watchedIds.has(v.videoId) && new Date(v.publishedAt).getTime() > t
+		).length;
+		return { kind: 'count' as const, n };
+	});
+
 	const mainSections: { id: string; label: string; icon: Component }[] = [
 		{ id: 'inbox', label: 'Inbox', icon: Inbox },
 		{ id: 'saved', label: 'Saved', icon: Bookmark },
@@ -84,7 +117,7 @@
 				size="sm"
 				class={cn(
 					'w-full text-xs h-7 gap-2',
-					section.id === 'saved' ? 'justify-between' : 'justify-start',
+					section.id === 'saved' || section.id === 'inbox' ? 'justify-between' : 'justify-start',
 					isActive(section.id) && 'bg-primary/20 text-foreground font-medium hover:bg-primary/25 hover:text-foreground'
 				)}
 				onclick={() => onSelectSection(section.id)}
@@ -96,6 +129,16 @@
 				{#if section.id === 'saved'}
 					<span class="shrink-0 tabular-nums text-[11px] font-normal text-muted-foreground">
 						{$savedVideos.length}
+					</span>
+				{:else if section.id === 'inbox'}
+					<span class="shrink-0 tabular-nums text-[11px] font-normal text-muted-foreground">
+						{#if inboxNavBadge.kind === 'infinity'}
+							∞
+						{:else if inboxNavBadge.kind === 'loading'}
+							…
+						{:else}
+							{inboxNavBadge.n}
+						{/if}
 					</span>
 				{/if}
 			</Button>

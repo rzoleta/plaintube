@@ -191,6 +191,9 @@
 			selectedVideoId={selectedVideo?.videoId ?? null}
 			onSelectVideo={handleSelectVideo}
 			onToggleSidebar={toggleSidebar}
+			onInboxReset={() => {
+				selectedVideo = null;
+			}}
 			onOrderedVideosChange={handleOrderedVideosChange}
 			onArchiveVideo={handleArchive}
 			onSaveToggleVideo={handleSaveToggle}
