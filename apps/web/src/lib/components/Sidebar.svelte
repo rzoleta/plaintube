@@ -7,6 +7,7 @@
 	import { ChevronDown, ChevronRight, LogOut, Inbox, Archive, Bookmark } from 'lucide-svelte';
 	import type { Component } from 'svelte';
 	import { cn } from '$lib/utils.js';
+	import { savedVideos } from '$lib/stores/saved';
 
 	interface Props {
 		activeSection: string;
@@ -82,13 +83,21 @@
 				variant="ghost"
 				size="sm"
 				class={cn(
-					'w-full justify-start text-xs h-7 gap-2',
+					'w-full text-xs h-7 gap-2',
+					section.id === 'saved' ? 'justify-between' : 'justify-start',
 					isActive(section.id) && 'bg-primary/20 text-foreground font-medium hover:bg-primary/25 hover:text-foreground'
 				)}
 				onclick={() => onSelectSection(section.id)}
 			>
-				<section.icon class="h-3.5 w-3.5 shrink-0" />
-				{section.label}
+				<span class="flex min-w-0 items-center gap-2">
+					<section.icon class="h-3.5 w-3.5 shrink-0" />
+					<span class="truncate">{section.label}</span>
+				</span>
+				{#if section.id === 'saved'}
+					<span class="shrink-0 tabular-nums text-[11px] font-normal text-muted-foreground">
+						{$savedVideos.length}
+					</span>
+				{/if}
 			</Button>
 		{/each}
 
