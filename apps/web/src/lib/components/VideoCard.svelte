@@ -54,12 +54,12 @@
 
 <div
   class={cn(
-    'group relative flex w-full items-start gap-2 border-b border-border px-3 py-2 text-left transition-colors cursor-pointer',
+    'group relative flex w-full items-start gap-2 border-b border-border px-3 py-2 text-left transition-colors cursor-pointer border-l-2',
     isActive
-      ? 'bg-primary text-primary-foreground'
+      ? 'bg-primary/20 text-foreground border-l-primary'
       : isWatched
-        ? 'bg-muted/50 text-muted-foreground hover:bg-muted'
-        : 'bg-card text-card-foreground hover:bg-accent',
+        ? 'bg-muted/50 text-muted-foreground hover:bg-muted border-l-transparent'
+        : 'bg-card text-card-foreground hover:bg-accent border-l-transparent',
   )}
   role="button"
   tabindex="0"
@@ -92,31 +92,20 @@
     <p
       class={cn(
         'text-xs font-medium leading-tight line-clamp-2',
-        isActive
-          ? 'text-primary-foreground'
-          : isWatched
-            ? 'text-muted-foreground'
-            : 'text-foreground',
+        isWatched && !isActive ? 'text-muted-foreground' : 'text-foreground',
       )}
     >
       {video.title}
     </p>
     <p
-      class={cn(
-        'mt-0.5 text-xs truncate',
-        isActive ? 'text-primary-foreground/70' : 'text-muted-foreground',
-      )}
+      class="mt-0.5 text-xs truncate text-muted-foreground"
     >
       {video.channelTitle}
     </p>
     <div class="mt-1">
       <Badge
-        variant={isActive ? 'secondary' : 'outline'}
-        class={cn(
-          'text-[10px] px-1 py-0 h-4 font-normal',
-          isActive &&
-            'bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30',
-        )}
+        variant="outline"
+        class="text-[10px] px-1 py-0 h-4 font-normal"
       >
         {relativeTime}
       </Badge>
