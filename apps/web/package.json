@@ -16,8 +16,14 @@
     "@auth/core": "^0.37.4",
     "@auth/sveltekit": "^1.7.4",
     "@tanstack/svelte-query": "^5.62.16",
+    "bits-ui": "^2.18.1",
+    "clsx": "^2.1.1",
     "esbuild": "^0.28.0",
-    "svelte": "^5.16.0"
+    "lucide-svelte": "^1.0.1",
+    "mode-watcher": "^1.1.0",
+    "svelte": "^5.16.0",
+    "tailwind-merge": "^3.5.0",
+    "tailwind-variants": "^3.2.2"
   },
   "devDependencies": {
     "@sveltejs/adapter-vercel": "^5.5.4",

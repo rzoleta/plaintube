@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { derived, readable } from 'svelte/store';
+	import { derived } from 'svelte/store';
 	import { createInfiniteQuery, createQuery, type InfiniteData } from '@tanstack/svelte-query';
 	import VideoCard from './VideoCard.svelte';
 	import type { VideoItem, PaginatedVideos, Subscription } from '$lib/api/youtube';
 	import { watchedIds } from '$lib/stores/watched';
 	import { savedVideos } from '$lib/stores/saved';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	interface Props {
 		activeSection: string;
@@ -27,11 +28,7 @@
 	}: Props = $props();
 
 	// Reactive props as stores for TanStack Query options
-	// We use a helper derived from a readable that reads the prop each time it ticks
-	// Since Svelte 5 rune props are reactive, wrapping them forces TanStack to see changes.
 	function reactiveStore<T>(getter: () => T) {
-		// Returns a Svelte store that updates whenever the component re-renders
-		// by using a writable that's updated via $effect
 		let subscribers: Array<(v: T) => void> = [];
 		let value = getter();
 
@@ -39,7 +36,6 @@
 			for (const s of subscribers) s(v);
 		}
 
-		// Update will be called by the $effect below
 		const store = {
 			subscribe(fn: (v: T) => void) {
 				subscribers.push(fn);
@@ -56,7 +52,6 @@
 		return store;
 	}
 
-	// Create reactive stores from props
 	const channelIdStore = reactiveStore(() => activeChannelId);
 	const playlistIdStore = reactiveStore(() => activePlaylistId);
 	const sectionStore = reactiveStore(() => activeSection);
@@ -165,7 +160,6 @@
 
 	const finalVideos = $derived((): VideoItem[] => {
 		if (activeChannelId) {
-			// When in inbox mode for a channel, filter watched
 			if (activeSection === 'inbox') {
 				return allChannelVideos.filter((v) => !$watchedIds.has(v.videoId));
 			}
@@ -227,32 +221,34 @@
 	}
 </script>
 
-<section class="flex h-full flex-col border-r border-gray-200 overflow-hidden bg-white">
+<section class="flex h-full flex-col border-r border-border overflow-hidden bg-background">
 	<!-- Section header -->
-	<div class="border-b border-gray-200 bg-gray-50 px-3 py-2 flex-shrink-0">
-		<h2 class="text-sm font-semibold text-gray-700">{sectionTitle}</h2>
+	<div class="border-b border-border bg-card px-3 py-2 flex-shrink-0">
+		<h2 class="text-sm font-semibold text-foreground">{sectionTitle}</h2>
 	</div>
 
 	<!-- Video list -->
 	<div class="flex-1 overflow-y-auto scrollbar-thin">
 		{#if isLoading}
-			<div class="flex items-center justify-center py-12 text-sm text-gray-400">
+			<div class="flex items-center justify-center py-12 text-sm text-muted-foreground">
 				Loading...
 			</div>
 		{:else if isError}
-			<div class="flex items-center justify-center py-12 text-sm text-red-500">
+			<div class="flex items-center justify-center py-12 text-sm text-destructive">
 				Failed to load videos.
 			</div>
 		{:else if finalVideos().length === 0}
-			<div class="flex flex-col items-center justify-center py-12 text-sm text-gray-400 gap-1 px-4 text-center">
+			<div
+				class="flex flex-col items-center justify-center py-12 text-sm text-muted-foreground gap-1 px-4 text-center"
+			>
 				{#if activeSection === 'inbox' && !activeChannelId && !activePlaylistId}
 					<p class="text-xs">Select a channel from the sidebar to load its videos.</p>
 				{:else if activeSection === 'watched'}
 					<p class="text-xs">No watched videos yet.</p>
-					<p class="text-xs text-gray-300">Watch videos and mark them as watched.</p>
+					<p class="text-xs text-muted-foreground/60">Watch videos and mark them as watched.</p>
 				{:else if activeSection === 'saved'}
 					<p class="text-xs">No saved videos yet.</p>
-					<p class="text-xs text-gray-300">Save videos to watch later.</p>
+					<p class="text-xs text-muted-foreground/60">Save videos to watch later.</p>
 				{:else}
 					<p class="text-xs">No videos found.</p>
 				{/if}
@@ -268,14 +264,16 @@
 
 			<!-- Load more -->
 			{#if hasNextPage}
-				<div class="p-3 text-center border-t border-gray-100">
-					<button
-						class="px-4 py-1.5 text-xs border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50"
+				<div class="p-3 text-center border-t border-border">
+					<Button
+						variant="outline"
+						size="sm"
+						class="text-xs h-7"
 						onclick={loadMore}
 						disabled={isFetchingNextPage}
 					>
 						{isFetchingNextPage ? 'Loading...' : 'Load more'}
-					</button>
+					</Button>
 				</div>
 			{/if}
 		{/if}

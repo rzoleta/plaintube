@@ -55,7 +55,7 @@
 	}
 </script>
 
-<div class="grid h-screen overflow-hidden" style="grid-template-columns: 200px 320px 1fr;">
+<div class="grid h-screen overflow-hidden bg-background" style="grid-template-columns: 10% 20% 70%;">
 	<!-- Column 1: Sidebar -->
 	<Sidebar
 		{activeSection}

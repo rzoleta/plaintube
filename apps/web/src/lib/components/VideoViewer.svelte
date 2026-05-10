@@ -2,6 +2,9 @@
 	import type { VideoItem } from '$lib/api/youtube';
 	import { watchedIds, markWatched, unmarkWatched } from '$lib/stores/watched';
 	import { savedVideos, saveVideo, unsaveVideo } from '$lib/stores/saved';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { Check, Bookmark, BookmarkCheck } from 'lucide-svelte';
 
 	interface Props {
 		video: VideoItem | null;
@@ -39,7 +42,7 @@
 	}
 </script>
 
-<section class="flex h-full flex-col overflow-hidden bg-white">
+<section class="flex h-full flex-col overflow-hidden bg-background">
 	{#if video}
 		<!-- YouTube embed -->
 		<div class="flex-shrink-0 bg-black">
@@ -58,56 +61,60 @@
 		<!-- Video metadata & actions -->
 		<div class="flex-1 overflow-y-auto scrollbar-thin p-4">
 			<!-- Title -->
-			<h1 class="text-base font-semibold leading-snug text-gray-900">
+			<h1 class="text-base font-semibold leading-snug text-foreground">
 				{video.title}
 			</h1>
 
 			<!-- Channel & date -->
-			<p class="mt-1 text-sm text-gray-500">
+			<p class="mt-1 text-sm text-muted-foreground">
 				{video.channelTitle}
-				<span class="mx-1 text-gray-300">·</span>
+				<span class="mx-1 text-muted-foreground/40">·</span>
 				{formatDate(video.publishedAt)}
 			</p>
 
 			<!-- Action buttons -->
 			<div class="mt-3 flex gap-2">
-				<button
-					class="px-3 py-1.5 text-xs border transition-colors
-						{isWatched
-						? 'bg-[#0078d4] text-white border-[#0078d4] hover:bg-[#006cbf]'
-						: 'border-gray-300 text-gray-600 hover:bg-gray-50'}"
+				<Button
+					variant={isWatched ? 'default' : 'outline'}
+					size="sm"
+					class="gap-1.5 text-xs h-8"
 					onclick={handleMarkWatched}
 				>
-					{isWatched ? '✓ Watched' : 'Mark as Watched'}
-				</button>
+					<Check class="h-3.5 w-3.5" />
+					{isWatched ? 'Watched' : 'Mark as Watched'}
+				</Button>
 
-				<button
-					class="px-3 py-1.5 text-xs border transition-colors
-						{isSaved
-						? 'bg-gray-700 text-white border-gray-700 hover:bg-gray-800'
-						: 'border-gray-300 text-gray-600 hover:bg-gray-50'}"
+				<Button
+					variant={isSaved ? 'secondary' : 'outline'}
+					size="sm"
+					class="gap-1.5 text-xs h-8"
 					onclick={handleSaveToggle}
 				>
-					{isSaved ? '★ Saved' : '☆ Save'}
-				</button>
+					{#if isSaved}
+						<BookmarkCheck class="h-3.5 w-3.5" />
+						Saved
+					{:else}
+						<Bookmark class="h-3.5 w-3.5" />
+						Save
+					{/if}
+				</Button>
 			</div>
 
 			<!-- Description -->
 			{#if video.description}
-				<div class="mt-4 border-t border-gray-200 pt-4">
-					<p class="text-xs text-gray-500 whitespace-pre-line line-clamp-6">
-						{video.description}
-					</p>
-				</div>
+				<Separator class="my-4" />
+				<p class="text-xs text-muted-foreground whitespace-pre-line line-clamp-6">
+					{video.description}
+				</p>
 			{/if}
 		</div>
 	{:else}
 		<!-- Empty state -->
-		<div class="flex h-full flex-col items-center justify-center gap-3 text-gray-300">
+		<div class="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground/30">
 			<div class="text-6xl">▶</div>
 			<div class="text-center">
-				<p class="text-sm font-medium text-gray-400">No video selected</p>
-				<p class="text-xs text-gray-300 mt-1">
+				<p class="text-sm font-medium text-muted-foreground">No video selected</p>
+				<p class="text-xs text-muted-foreground/60 mt-1">
 					Select a video from the list to begin watching
 				</p>
 			</div>

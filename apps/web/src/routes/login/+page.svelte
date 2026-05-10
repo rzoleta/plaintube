@@ -1,32 +1,44 @@
 <script lang="ts">
 	import { signIn } from '@auth/sveltekit/client';
+	import {
+		Card,
+		CardHeader,
+		CardTitle,
+		CardDescription,
+		CardContent,
+		CardFooter
+	} from '$lib/components/ui/card/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
 </script>
 
 <svelte:head>
 	<title>Sign in — PlainTube</title>
 </svelte:head>
 
-<div class="flex min-h-screen items-center justify-center bg-gray-100">
-	<div class="w-full max-w-sm border border-gray-300 bg-white shadow-sm">
-		<!-- Header bar mimicking an enterprise app title bar -->
-		<div class="bg-[#0078d4] px-6 py-3">
-			<span class="text-lg font-bold tracking-wide text-white">PlainTube</span>
-		</div>
+<div class="flex min-h-screen items-center justify-center bg-background px-4">
+	<div class="w-full max-w-sm">
+		<Card class="overflow-hidden rounded-lg shadow-md">
+			<!-- Blue header bar -->
+			<div class="bg-primary px-6 py-3">
+				<span class="text-base font-bold tracking-wide text-primary-foreground">PlainTube</span>
+			</div>
 
-		<!-- Card body -->
-		<div class="px-8 py-8">
-			<h1 class="text-sm font-semibold text-gray-800">Sign in to continue</h1>
-			<p class="mt-1 text-xs text-gray-500">
-				Your YouTube subscriptions. No algorithm.
-			</p>
+			<CardHeader class="pb-3">
+				<CardTitle class="text-sm font-semibold">Sign in to continue</CardTitle>
+				<CardDescription class="text-xs">
+					Your YouTube subscriptions. No algorithm.
+				</CardDescription>
+			</CardHeader>
 
-			<div class="mt-6">
-				<button
-					class="flex w-full items-center justify-center gap-3 border border-gray-300 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+			<CardContent class="pb-4">
+				<Button
+					variant="outline"
+					class="w-full gap-3 justify-center text-sm"
 					onclick={() => signIn('google', { callbackUrl: '/' })}
 				>
 					<!-- Google G logo SVG -->
-					<svg class="h-4 w-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<svg class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 						<path
 							d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
 							fill="#4285F4"
@@ -45,27 +57,28 @@
 						/>
 					</svg>
 					Sign in with Google
-				</button>
-			</div>
+				</Button>
 
-			<p class="mt-6 text-center text-xs text-gray-400">
-				PlainTube uses YouTube's official API.<br />
-				No data is stored on our servers.
-			</p>
-		</div>
+				<p class="mt-5 text-center text-xs text-muted-foreground">
+					PlainTube uses YouTube's official API.<br />
+					No data is stored on our servers.
+				</p>
+			</CardContent>
 
-		<!-- Footer -->
-		<div class="border-t border-gray-200 px-6 py-2">
-			<p class="text-center text-xs text-gray-400">
-				<a
-					href="https://github.com/plaintube/plaintube"
-					class="hover:text-gray-600 transition-colors"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Open source · AGPL-3.0
-				</a>
-			</p>
-		</div>
+			<Separator />
+
+			<CardFooter class="py-2.5">
+				<p class="w-full text-center text-xs text-muted-foreground">
+					<a
+						href="https://github.com/plaintube/plaintube"
+						class="hover:text-foreground transition-colors"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Open source · AGPL-3.0
+					</a>
+				</p>
+			</CardFooter>
+		</Card>
 	</div>
 </div>
