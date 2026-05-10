@@ -1,12 +1,14 @@
 import { browser } from '$app/environment';
 import { writable, derived } from 'svelte/store';
+import type { VideoItem } from '$lib/api/youtube';
 
-const STORAGE_KEY = 'plaintube:watched';
+const IDS_KEY = 'plaintube:watched';
+const ITEMS_KEY = 'plaintube:archived';
 
 function loadWatched(): Set<string> {
 	if (!browser) return new Set();
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		const raw = localStorage.getItem(IDS_KEY);
 		if (!raw) return new Set();
 		const parsed = JSON.parse(raw) as string[];
 		return new Set(Array.isArray(parsed) ? parsed : []);
@@ -15,38 +17,68 @@ function loadWatched(): Set<string> {
 	}
 }
 
-function persist(ids: Set<string>): void {
-	if (!browser) return;
+function loadArchived(): VideoItem[] {
+	if (!browser) return [];
 	try {
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(ids)));
+		const raw = localStorage.getItem(ITEMS_KEY);
+		if (!raw) return [];
+		const parsed = JSON.parse(raw) as unknown;
+		return Array.isArray(parsed) ? (parsed as VideoItem[]) : [];
 	} catch {
-		// ignore storage errors
+		return [];
 	}
 }
 
-const _store = writable<Set<string>>(loadWatched());
+function persistIds(ids: Set<string>): void {
+	if (!browser) return;
+	try {
+		localStorage.setItem(IDS_KEY, JSON.stringify(Array.from(ids)));
+	} catch {}
+}
 
-export const watchedIds = derived(_store, ($s) => $s);
+function persistItems(items: VideoItem[]): void {
+	if (!browser) return;
+	try {
+		localStorage.setItem(ITEMS_KEY, JSON.stringify(items));
+	} catch {}
+}
 
-export function markWatched(videoId: string): void {
-	_store.update((s) => {
-		const next = new Set([...s, videoId]);
-		persist(next);
+const _ids = writable<Set<string>>(loadWatched());
+const _items = writable<VideoItem[]>(loadArchived());
+
+export const watchedIds = derived(_ids, ($s) => $s);
+export const archivedVideos = derived(_items, ($s) => $s);
+
+export function markWatched(video: VideoItem): void {
+	_ids.update((s) => {
+		const next = new Set([...s, video.videoId]);
+		persistIds(next);
+		return next;
+	});
+	_items.update((s) => {
+		if (s.some((v) => v.videoId === video.videoId)) return s;
+		const next = [video, ...s];
+		persistItems(next);
 		return next;
 	});
 }
 
 export function unmarkWatched(videoId: string): void {
-	_store.update((s) => {
+	_ids.update((s) => {
 		const next = new Set(s);
 		next.delete(videoId);
-		persist(next);
+		persistIds(next);
+		return next;
+	});
+	_items.update((s) => {
+		const next = s.filter((v) => v.videoId !== videoId);
+		persistItems(next);
 		return next;
 	});
 }
 
 export function isWatched(videoId: string): boolean {
 	let result = false;
-	_store.subscribe((s) => (result = s.has(videoId)))();
+	_ids.subscribe((s) => (result = s.has(videoId)))();
 	return result;
 }

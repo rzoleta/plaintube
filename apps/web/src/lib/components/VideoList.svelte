@@ -3,7 +3,7 @@
 	import { createInfiniteQuery, createQuery, type InfiniteData } from '@tanstack/svelte-query';
 	import VideoCard from './VideoCard.svelte';
 	import type { VideoItem, PaginatedVideos, Subscription } from '$lib/api/youtube';
-	import { watchedIds } from '$lib/stores/watched';
+	import { watchedIds, archivedVideos } from '$lib/stores/watched';
 	import { savedVideos } from '$lib/stores/saved';
 	import { inboxResetAt, resetInbox, clearInboxReset } from '$lib/stores/inbox-reset';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -231,7 +231,7 @@
 				return items;
 			}
 			case 'watched':
-				return $savedVideos.filter((v) => $watchedIds.has(v.videoId));
+				return $archivedVideos;
 			case 'saved':
 				return $savedVideos;
 			default:

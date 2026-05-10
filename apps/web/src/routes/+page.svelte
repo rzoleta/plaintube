@@ -78,7 +78,8 @@
 		const idx = list.findIndex((x) => x.videoId === video.videoId);
 		const next =
 			idx >= 0 && idx + 1 < list.length ? (list[idx + 1] ?? null) : null;
-		markWatched(video.videoId);
+		markWatched(video);
+		unsaveVideo(video.videoId);
 		toast.success('Archived');
 		if (selectedVideo?.videoId === video.videoId) {
 			selectedVideo = next;
