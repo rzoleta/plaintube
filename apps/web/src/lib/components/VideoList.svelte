@@ -2,7 +2,7 @@
 	import { derived } from 'svelte/store';
 	import { createInfiniteQuery, createQuery, type InfiniteData } from '@tanstack/svelte-query';
 	import VideoCard from './VideoCard.svelte';
-	import type { VideoItem, PaginatedVideos, Subscription } from '$lib/api/youtube';
+	import type { VideoItem, PaginatedVideos } from '$lib/api/youtube';
 	import { watchedIds } from '$lib/stores/watched';
 	import { savedVideos } from '$lib/stores/saved';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -110,28 +110,24 @@
 		string | null
 	>(playlistOptions);
 
-	// ─── Subscriptions (for inbox loading indicator) ──────────────────────────
+	// ─── Inbox query (all subscribed channels merged) ────────────────────────
 
-	const subOptions = derived(
+	const inboxOptions = derived(
 		[sectionStore, channelIdStore, playlistIdStore],
 		([$section, $channelId, $playlistId]) => ({
-			queryKey: ['subscriptions'] as const,
+			queryKey: ['inbox'] as const,
 			queryFn: async () => {
-				const cached = sessionStorage.getItem('plaintube:subscriptions');
-				if (cached) return JSON.parse(cached) as Subscription[];
-				const res = await fetch('/api/subscriptions');
-				if (!res.ok) throw new Error('Failed to fetch subscriptions');
-				const data = (await res.json()) as Subscription[];
-				sessionStorage.setItem('plaintube:subscriptions', JSON.stringify(data));
-				return data;
+				const res = await fetch('/api/inbox');
+				if (!res.ok) throw new Error(await res.text());
+				return res.json() as Promise<PaginatedVideos>;
 			},
-			staleTime: 1000 * 60 * 30,
+			staleTime: 1000 * 60 * 10, // 10 min — inbox is expensive to fetch
 			enabled: $section === 'inbox' && !$channelId && !$playlistId
 		})
 	);
 
-	const subscriptionsQuery = createQuery<Subscription[], Error, Subscription[], readonly string[]>(
-		subOptions
+	const inboxQuery = createQuery<PaginatedVideos, Error, PaginatedVideos, readonly string[]>(
+		inboxOptions
 	);
 
 	// ─── Derived state ────────────────────────────────────────────────────────
@@ -160,15 +156,14 @@
 
 	const finalVideos = $derived((): VideoItem[] => {
 		if (activeChannelId) {
-			if (activeSection === 'inbox') {
-				return allChannelVideos.filter((v) => !$watchedIds.has(v.videoId));
-			}
-			return allChannelVideos;
+			return allChannelVideos.filter((v) =>
+				activeSection === 'inbox' ? !$watchedIds.has(v.videoId) : true
+			);
 		}
-		if (activePlaylistId) {
-			return allPlaylistVideos;
-		}
+		if (activePlaylistId) return allPlaylistVideos;
 		switch (activeSection) {
+			case 'inbox':
+				return ($inboxQuery.data?.items ?? []).filter((v) => !$watchedIds.has(v.videoId));
 			case 'watched':
 				return $savedVideos.filter((v) => $watchedIds.has(v.videoId));
 			case 'saved':
@@ -184,7 +179,7 @@
 			: activePlaylistId
 				? $playlistVideosQuery.isLoading
 				: activeSection === 'inbox'
-					? $subscriptionsQuery.isLoading
+					? $inboxQuery.isLoading
 					: false
 	);
 
@@ -193,7 +188,9 @@
 			? $channelVideosQuery.isError
 			: activePlaylistId
 				? $playlistVideosQuery.isError
-				: false
+				: activeSection === 'inbox'
+					? $inboxQuery.isError
+					: false
 	);
 
 	const hasNextPage = $derived(

@@ -139,27 +139,45 @@ export async function getAllSubscriptions(accessToken: string): Promise<Subscrip
 }
 
 /**
- * Get the uploads playlist ID for a channel.
+ * Get uploads playlist IDs for up to 50 channel IDs in one API call.
+ * Returns a map of channelId → uploadsPlaylistId.
+ */
+export async function getBatchUploadsPlaylistIds(
+	channelIds: string[],
+	accessToken: string
+): Promise<Map<string, string>> {
+	interface YTChannelList {
+		items?: Array<{
+			id: string;
+			contentDetails: { relatedPlaylists: { uploads: string } };
+		}>;
+	}
+
+	const result = new Map<string, string>();
+	// channels.list accepts comma-separated ids, max 50 per call
+	for (let i = 0; i < channelIds.length; i += 50) {
+		const batch = channelIds.slice(i, i + 50);
+		const data = await ytFetch<YTChannelList>(
+			'channels',
+			{ part: 'contentDetails', id: batch.join(',') },
+			accessToken
+		);
+		for (const item of data.items ?? []) {
+			result.set(item.id, item.contentDetails.relatedPlaylists.uploads);
+		}
+	}
+	return result;
+}
+
+/**
+ * Get the uploads playlist ID for a single channel.
  */
 export async function getChannelUploadsPlaylistId(
 	channelId: string,
 	accessToken: string
 ): Promise<string | null> {
-	interface YTChannelList {
-		items?: Array<{
-			contentDetails: {
-				relatedPlaylists: { uploads: string };
-			};
-		}>;
-	}
-
-	const data = await ytFetch<YTChannelList>(
-		'channels',
-		{ part: 'contentDetails', id: channelId },
-		accessToken
-	);
-
-	return data.items?.[0]?.contentDetails.relatedPlaylists.uploads ?? null;
+	const map = await getBatchUploadsPlaylistIds([channelId], accessToken);
+	return map.get(channelId) ?? null;
 }
 
 /**
