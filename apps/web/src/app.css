@@ -4,50 +4,50 @@
 
 @layer base {
 	:root {
-		/* PlainTube blue-based theme — maps #0078d4 to primary */
+		/* light: white bg, zinc text, #0078d4 primary, blue-50 accent hover */
 		--background: 0 0% 100%;
-		--foreground: 222.2 84% 4.9%;
+		--foreground: 240 10% 3.9%;        /* zinc-950 */
 		--card: 0 0% 100%;
-		--card-foreground: 222.2 84% 4.9%;
+		--card-foreground: 240 10% 3.9%;
 		--popover: 0 0% 100%;
-		--popover-foreground: 222.2 84% 4.9%;
-		/* #0078d4 ≈ hsl(206, 100%, 41%) */
-		--primary: 206 100% 41%;
-		--primary-foreground: 210 40% 98%;
-		--secondary: 210 40% 96.1%;
-		--secondary-foreground: 222.2 47.4% 11.2%;
-		--muted: 210 40% 96.1%;
-		--muted-foreground: 215.4 16.3% 46.9%;
-		--accent: 210 40% 96.1%;
-		--accent-foreground: 222.2 47.4% 11.2%;
+		--popover-foreground: 240 10% 3.9%;
+		--primary: 206 100% 41%;           /* #0078d4 */
+		--primary-foreground: 0 0% 98%;
+		--secondary: 240 4.8% 95.9%;      /* zinc-100 */
+		--secondary-foreground: 240 5.9% 10%;
+		--muted: 240 4.8% 95.9%;          /* zinc-100 */
+		--muted-foreground: 240 3.8% 46.1%; /* zinc-500 */
+		--accent: 214 100% 97%;            /* blue-50 — subtle blue hover */
+		--accent-foreground: 221 83% 30%;  /* deep blue text on hover */
 		--destructive: 0 84.2% 60.2%;
-		--destructive-foreground: 210 40% 98%;
-		--border: 214.3 31.8% 91.4%;
-		--input: 214.3 31.8% 91.4%;
+		--destructive-foreground: 0 0% 98%;
+		--border: 240 5.9% 90%;            /* zinc-200 */
+		--input: 240 5.9% 90%;
 		--ring: 206 100% 41%;
 		--radius: 0.375rem;
 	}
 
 	.dark {
-		--background: 222.2 84% 4.9%;
-		--foreground: 210 40% 98%;
-		--card: 222.2 84% 4.9%;
-		--card-foreground: 210 40% 98%;
-		--popover: 222.2 84% 4.9%;
-		--popover-foreground: 210 40% 98%;
-		--primary: 206 100% 50%;
-		--primary-foreground: 222.2 47.4% 11.2%;
-		--secondary: 217.2 32.6% 17.5%;
-		--secondary-foreground: 210 40% 98%;
-		--muted: 217.2 32.6% 17.5%;
-		--muted-foreground: 215 20.2% 65.1%;
-		--accent: 217.2 32.6% 17.5%;
-		--accent-foreground: 210 40% 98%;
-		--destructive: 0 62.8% 30.6%;
-		--destructive-foreground: 210 40% 98%;
-		--border: 217.2 32.6% 17.5%;
-		--input: 217.2 32.6% 17.5%;
-		--ring: 206 100% 50%;
+		/* dark: zinc-950 bg, zinc-900 card, blue-900 accent hover */
+		--background: 240 10% 3.9%;        /* zinc-950 */
+		--foreground: 0 0% 98%;
+		--card: 240 5.9% 10%;              /* zinc-900 */
+		--card-foreground: 0 0% 98%;
+		--popover: 240 5.9% 10%;
+		--popover-foreground: 0 0% 98%;
+		--primary: 217 91% 60%;            /* blue-500 — brighter on dark */
+		--primary-foreground: 0 0% 98%;
+		--secondary: 240 3.7% 15.9%;      /* zinc-800 */
+		--secondary-foreground: 0 0% 98%;
+		--muted: 240 3.7% 15.9%;          /* zinc-800 */
+		--muted-foreground: 240 5% 64.9%; /* zinc-400 */
+		--accent: 224 64% 20%;             /* blue-900 — dark blue hover bg */
+		--accent-foreground: 214 100% 97%; /* blue-50 — light text on dark blue */
+		--destructive: 0 62.8% 50%;
+		--destructive-foreground: 0 0% 98%;
+		--border: 240 3.7% 15.9%;         /* zinc-800 */
+		--input: 240 3.7% 15.9%;
+		--ring: 217 91% 60%;
 	}
 
 	* {
