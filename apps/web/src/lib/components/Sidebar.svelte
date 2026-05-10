@@ -70,7 +70,7 @@
 
 <aside class="flex h-full flex-col overflow-hidden border-r border-border bg-card">
 	<!-- App header -->
-	<div class="flex-shrink-0 bg-primary px-3 py-2.5">
+	<div class="flex-shrink-0 bg-primary/70 dark:bg-primary/50 px-3 py-2.5">
 		<span class="text-sm font-bold tracking-wide text-primary-foreground">PlainTube</span>
 	</div>
 
