@@ -5,6 +5,7 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import DarkModeToggle from '$lib/components/ui/dark-mode-toggle/DarkModeToggle.svelte';
 	import { ChevronDown, ChevronRight, LogOut, Inbox, Archive, Bookmark } from 'lucide-svelte';
+	import KeyboardShortcutsDialog from './KeyboardShortcutsDialog.svelte';
 	import type { Component } from 'svelte';
 	import { derived } from 'svelte/store';
 	import { cn } from '$lib/utils.js';
@@ -104,8 +105,9 @@
 
 <aside class="flex h-full flex-col overflow-hidden border-r border-border bg-card">
 	<!-- App header -->
-	<div class="flex-shrink-0 bg-primary/70 dark:bg-primary/50 px-3 py-2.5">
+	<div class="flex-shrink-0 bg-primary/70 dark:bg-primary/50 px-3 py-2.5 flex items-center justify-between">
 		<span class="text-sm font-bold tracking-wide text-primary-foreground">PlainTube</span>
+		<KeyboardShortcutsDialog />
 	</div>
 
 	<!-- Scrollable nav area -->
