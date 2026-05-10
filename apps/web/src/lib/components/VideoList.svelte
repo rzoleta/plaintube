@@ -6,6 +6,7 @@
 	import { watchedIds } from '$lib/stores/watched';
 	import { savedVideos } from '$lib/stores/saved';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { PanelLeftClose } from 'lucide-svelte';
 
 	interface Props {
 		activeSection: string;
@@ -15,6 +16,7 @@
 		activePlaylistTitle: string | null;
 		selectedVideoId: string | null;
 		onSelectVideo: (video: VideoItem) => void;
+		onToggleSidebar?: () => void;
 	}
 
 	const {
@@ -24,7 +26,8 @@
 		activeChannelTitle,
 		activePlaylistTitle,
 		selectedVideoId,
-		onSelectVideo
+		onSelectVideo,
+		onToggleSidebar
 	}: Props = $props();
 
 	// Reactive props as stores for TanStack Query options
@@ -220,8 +223,19 @@
 
 <section class="flex h-full flex-col border-r border-border overflow-hidden bg-background">
 	<!-- Section header -->
-	<div class="border-b border-border bg-card px-3 py-2 flex-shrink-0">
-		<h2 class="text-sm font-semibold text-foreground">{sectionTitle}</h2>
+	<div class="border-b border-border bg-card px-3 py-2 flex-shrink-0 flex items-center justify-between gap-2">
+		<h2 class="text-sm font-semibold text-foreground truncate">{sectionTitle}</h2>
+		{#if onToggleSidebar}
+			<button
+				type="button"
+				onclick={onToggleSidebar}
+				class="shrink-0 inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-background/80 transition-colors"
+				title="Hide sidebar"
+				aria-label="Hide sidebar"
+			>
+				<PanelLeftClose class="h-4 w-4" />
+			</button>
+		{/if}
 	</div>
 
 	<!-- Video list -->
