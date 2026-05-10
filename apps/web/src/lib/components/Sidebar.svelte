@@ -83,7 +83,7 @@
 				size="sm"
 				class={cn(
 					'w-full justify-start text-xs h-7 gap-2',
-					isActive(section.id) && 'bg-primary/10 text-primary font-medium hover:bg-primary/15 hover:text-primary'
+					isActive(section.id) && 'bg-primary/10 text-foreground font-medium hover:bg-primary/15 hover:text-foreground'
 				)}
 				onclick={() => onSelectSection(section.id)}
 			>
@@ -121,7 +121,7 @@
 								size="sm"
 								class={cn(
 									'w-full justify-start text-xs h-7 pl-4 truncate',
-									activePlaylistId === playlist.id && 'bg-primary/10 text-primary font-medium hover:bg-primary/15 hover:text-primary'
+									activePlaylistId === playlist.id && 'bg-primary/10 text-foreground font-medium hover:bg-primary/15 hover:text-foreground'
 								)}
 								onclick={() => onSelectPlaylist(playlist.id, playlist.title)}
 								title={playlist.title}
@@ -167,7 +167,7 @@
 								size="sm"
 								class={cn(
 									'w-full justify-start text-xs h-7 pl-3 gap-1.5',
-									activeChannelId === sub.channelId && 'bg-primary/10 text-primary font-medium hover:bg-primary/15 hover:text-primary'
+									activeChannelId === sub.channelId && 'bg-primary/10 text-foreground font-medium hover:bg-primary/15 hover:text-foreground'
 								)}
 								onclick={() => onSelectChannel(sub.channelId, sub.title)}
 								title={sub.title}
