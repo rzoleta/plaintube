@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { VideoItem } from '$lib/api/youtube';
-	import { watchedStore } from '$lib/stores/watched';
+	import { watchedIds } from '$lib/stores/watched';
 
 	interface Props {
 		video: VideoItem;
@@ -31,7 +31,7 @@
 		return `${diffYr}y ago`;
 	}
 
-	const isWatched = $derived(watchedStore.isWatched(video.videoId));
+	const isWatched = $derived($watchedIds.has(video.videoId));
 	const relativeTime = $derived(formatRelativeTime(video.publishedAt));
 </script>
 

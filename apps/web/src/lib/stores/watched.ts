@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { writable, derived } from 'svelte/store';
 
 const STORAGE_KEY = 'plaintube:watched';
 
@@ -14,7 +15,7 @@ function loadWatched(): Set<string> {
 	}
 }
 
-function saveWatched(ids: Set<string>): void {
+function persist(ids: Set<string>): void {
 	if (!browser) return;
 	try {
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(ids)));
@@ -23,29 +24,29 @@ function saveWatched(ids: Set<string>): void {
 	}
 }
 
-// ─── Svelte 5 rune-based store ────────────────────────────────────────────────
+const _store = writable<Set<string>>(loadWatched());
 
-let _watchedIds = $state<Set<string>>(loadWatched());
+export const watchedIds = derived(_store, ($s) => $s);
 
-export const watchedStore = {
-	get ids() {
-		return _watchedIds;
-	},
-	markWatched(videoId: string) {
-		_watchedIds = new Set([..._watchedIds, videoId]);
-		saveWatched(_watchedIds);
-	},
-	unmarkWatched(videoId: string) {
-		const next = new Set(_watchedIds);
+export function markWatched(videoId: string): void {
+	_store.update((s) => {
+		const next = new Set([...s, videoId]);
+		persist(next);
+		return next;
+	});
+}
+
+export function unmarkWatched(videoId: string): void {
+	_store.update((s) => {
+		const next = new Set(s);
 		next.delete(videoId);
-		_watchedIds = next;
-		saveWatched(_watchedIds);
-	},
-	isWatched(videoId: string): boolean {
-		return _watchedIds.has(videoId);
-	},
-	clear() {
-		_watchedIds = new Set();
-		saveWatched(_watchedIds);
-	}
-};
+		persist(next);
+		return next;
+	});
+}
+
+export function isWatched(videoId: string): boolean {
+	let result = false;
+	_store.subscribe((s) => (result = s.has(videoId)))();
+	return result;
+}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { VideoItem } from '$lib/api/youtube';
-	import { watchedStore } from '$lib/stores/watched';
-	import { savedStore } from '$lib/stores/saved';
+	import { watchedIds, markWatched, unmarkWatched } from '$lib/stores/watched';
+	import { savedVideos, saveVideo, unsaveVideo } from '$lib/stores/saved';
 
 	interface Props {
 		video: VideoItem | null;
@@ -9,8 +9,8 @@
 
 	const { video }: Props = $props();
 
-	const isWatched = $derived(video ? watchedStore.isWatched(video.videoId) : false);
-	const isSaved = $derived(video ? savedStore.isSaved(video.videoId) : false);
+	const isWatched = $derived(video ? $watchedIds.has(video.videoId) : false);
+	const isSaved = $derived(video ? $savedVideos.some((v) => v.videoId === video!.videoId) : false);
 
 	function formatDate(dateStr: string): string {
 		return new Date(dateStr).toLocaleDateString('en-US', {
@@ -23,18 +23,18 @@
 	function handleMarkWatched() {
 		if (!video) return;
 		if (isWatched) {
-			watchedStore.unmarkWatched(video.videoId);
+			unmarkWatched(video.videoId);
 		} else {
-			watchedStore.markWatched(video.videoId);
+			markWatched(video.videoId);
 		}
 	}
 
 	function handleSaveToggle() {
 		if (!video) return;
 		if (isSaved) {
-			savedStore.unsaveVideo(video.videoId);
+			unsaveVideo(video.videoId);
 		} else {
-			savedStore.saveVideo(video);
+			saveVideo(video);
 		}
 	}
 </script>

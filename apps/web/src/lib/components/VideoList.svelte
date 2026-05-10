@@ -3,8 +3,8 @@
 	import { createInfiniteQuery, createQuery, type InfiniteData } from '@tanstack/svelte-query';
 	import VideoCard from './VideoCard.svelte';
 	import type { VideoItem, PaginatedVideos, Subscription } from '$lib/api/youtube';
-	import { watchedStore } from '$lib/stores/watched';
-	import { savedStore } from '$lib/stores/saved';
+	import { watchedIds } from '$lib/stores/watched';
+	import { savedVideos } from '$lib/stores/saved';
 
 	interface Props {
 		activeSection: string;
@@ -167,7 +167,7 @@
 		if (activeChannelId) {
 			// When in inbox mode for a channel, filter watched
 			if (activeSection === 'inbox') {
-				return allChannelVideos.filter((v) => !watchedStore.isWatched(v.videoId));
+				return allChannelVideos.filter((v) => !$watchedIds.has(v.videoId));
 			}
 			return allChannelVideos;
 		}
@@ -175,12 +175,10 @@
 			return allPlaylistVideos;
 		}
 		switch (activeSection) {
-			case 'watched': {
-				const watchedIds = watchedStore.ids;
-				return savedStore.videos.filter((v) => watchedIds.has(v.videoId));
-			}
+			case 'watched':
+				return $savedVideos.filter((v) => $watchedIds.has(v.videoId));
 			case 'saved':
-				return savedStore.videos;
+				return $savedVideos;
 			default:
 				return [];
 		}

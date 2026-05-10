@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { writable, derived } from 'svelte/store';
 import type { VideoItem } from '$lib/api/youtube';
 
 const STORAGE_KEY = 'plaintube:saved';
@@ -15,7 +16,7 @@ function loadSaved(): VideoItem[] {
 	}
 }
 
-function saveSaved(items: VideoItem[]): void {
+function persist(items: VideoItem[]): void {
 	if (!browser) return;
 	try {
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
@@ -24,28 +25,29 @@ function saveSaved(items: VideoItem[]): void {
 	}
 }
 
-// ─── Svelte 5 rune-based store ────────────────────────────────────────────────
+const _store = writable<VideoItem[]>(loadSaved());
 
-let _savedVideos = $state<VideoItem[]>(loadSaved());
+export const savedVideos = derived(_store, ($s) => $s);
 
-export const savedStore = {
-	get videos() {
-		return _savedVideos;
-	},
-	saveVideo(video: VideoItem) {
-		if (_savedVideos.some((v) => v.videoId === video.videoId)) return;
-		_savedVideos = [video, ..._savedVideos];
-		saveSaved(_savedVideos);
-	},
-	unsaveVideo(videoId: string) {
-		_savedVideos = _savedVideos.filter((v) => v.videoId !== videoId);
-		saveSaved(_savedVideos);
-	},
-	isSaved(videoId: string): boolean {
-		return _savedVideos.some((v) => v.videoId === videoId);
-	},
-	clear() {
-		_savedVideos = [];
-		saveSaved(_savedVideos);
-	}
-};
+export function saveVideo(video: VideoItem): void {
+	_store.update((s) => {
+		if (s.some((v) => v.videoId === video.videoId)) return s;
+		const next = [video, ...s];
+		persist(next);
+		return next;
+	});
+}
+
+export function unsaveVideo(videoId: string): void {
+	_store.update((s) => {
+		const next = s.filter((v) => v.videoId !== videoId);
+		persist(next);
+		return next;
+	});
+}
+
+export function isSaved(videoId: string): boolean {
+	let result = false;
+	_store.subscribe((s) => (result = s.some((v) => v.videoId === videoId)))();
+	return result;
+}
