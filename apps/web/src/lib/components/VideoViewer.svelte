@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import type { VideoItem } from '$lib/api/youtube';
 	import { watchedIds } from '$lib/stores/watched';
 	import { savedVideos } from '$lib/stores/saved';
@@ -67,6 +68,26 @@
 	}));
 
 	const channelQuery = createQuery(channelOptions);
+
+	let iframeEl = $state<HTMLIFrameElement | null>(null);
+
+	const embedSrc = $derived.by(() => {
+		if (!video) return '';
+		const origin =
+			browser && typeof window !== 'undefined'
+				? `&origin=${encodeURIComponent(window.location.origin)}`
+				: '';
+		return `https://www.youtube.com/embed/${video.videoId}?autoplay=0&rel=0&modestbranding=1&enablejsapi=1${origin}`;
+	});
+
+	/** YouTube IFrame API command (requires enablejsapi=1 on embed URL). */
+	export function playEmbeddedVideo(): void {
+		if (!iframeEl?.contentWindow) return;
+		iframeEl.contentWindow.postMessage(
+			JSON.stringify({ event: 'command', func: 'playVideo', args: [] }),
+			'https://www.youtube.com'
+		);
+	}
 </script>
 
 <section class="flex h-full flex-col overflow-hidden bg-background">
@@ -75,8 +96,9 @@
 		<div class="flex-shrink-0 bg-black">
 			<div class="relative w-full" style="padding-bottom: 56.25%;">
 				<iframe
+					bind:this={iframeEl}
 					class="absolute inset-0 h-full w-full"
-					src="https://www.youtube.com/embed/{video.videoId}?autoplay=0&rel=0&modestbranding=1"
+					src={embedSrc}
 					title={video.title}
 					frameborder="0"
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

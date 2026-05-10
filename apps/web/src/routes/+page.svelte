@@ -25,6 +25,9 @@
 	/** Mirrors VideoList ordering for archive → select-next and shortcuts (stale while sidebar/list hidden). */
 	let orderedVideos = $state<VideoItem[]>([]);
 
+	type VideoViewerHandle = { playEmbeddedVideo(): void };
+	let viewerRef = $state<VideoViewerHandle | null>(null);
+
 	function toggleSidebar() {
 		sidebarHidden = !sidebarHidden;
 	}
@@ -85,7 +88,10 @@
 	function handleSaveToggle(video: VideoItem) {
 		const saved = $savedVideos.some((x) => x.videoId === video.videoId);
 		if (saved) unsaveVideo(video.videoId);
-		else saveVideo(video);
+		else {
+			saveVideo(video);
+			toast.success('Saved');
+		}
 	}
 
 	function isTypingTarget(target: EventTarget | null): boolean {
@@ -103,10 +109,42 @@
 			if (e.metaKey || e.ctrlKey || e.altKey) return;
 			if (isTypingTarget(e.target)) return;
 
+			const list = orderedVideos;
+			const k = e.key;
+
+			if (k === ' ' || e.code === 'Space') {
+				if (!selectedVideo) return;
+				e.preventDefault();
+				viewerRef?.playEmbeddedVideo();
+				return;
+			}
+
+			if (k === 'j' || k === 'J') {
+				if (list.length === 0) return;
+				e.preventDefault();
+				const idx = selectedVideo
+					? list.findIndex((x) => x.videoId === selectedVideo!.videoId)
+					: -1;
+				if (idx === -1) {
+					selectedVideo = list[0] ?? null;
+					return;
+				}
+				if (idx < list.length - 1) selectedVideo = list[idx + 1] ?? null;
+				return;
+			}
+
+			if (k === 'k' || k === 'K') {
+				if (list.length === 0 || !selectedVideo) return;
+				e.preventDefault();
+				const idx = list.findIndex((x) => x.videoId === selectedVideo!.videoId);
+				if (idx <= 0) return;
+				selectedVideo = list[idx - 1] ?? null;
+				return;
+			}
+
 			const v = selectedVideo;
 			if (!v) return;
 
-			const k = e.key;
 			if (k === 'e' || k === 'E') {
 				e.preventDefault();
 				handleArchive(v);
@@ -161,6 +199,7 @@
 
 	<!-- Column 3: Video Viewer -->
 	<VideoViewer
+		bind:this={viewerRef}
 		video={selectedVideo}
 		onArchive={handleArchive}
 		onSaveToggle={handleSaveToggle}
