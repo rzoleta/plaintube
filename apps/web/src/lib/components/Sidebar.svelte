@@ -138,7 +138,9 @@
 				{#if $subscriptionsQuery.isLoading}
 					<div class="px-3 py-1 text-xs text-gray-400">Loading...</div>
 				{:else if $subscriptionsQuery.isError}
-					<div class="px-3 py-1 text-xs text-red-500">Failed to load</div>
+					<div class="px-3 py-2 text-xs text-red-500 break-words">
+						Error: {$subscriptionsQuery.error?.message ?? 'Failed to load'}
+					</div>
 				{:else if $subscriptionsQuery.data}
 					{#each $subscriptionsQuery.data as sub (sub.channelId)}
 						<button

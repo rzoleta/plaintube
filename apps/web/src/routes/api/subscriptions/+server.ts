@@ -14,6 +14,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		return json(subscriptions);
 	} catch (err) {
 		const message = err instanceof Error ? err.message : 'Unknown error';
-		throw error(500, `Failed to fetch subscriptions: ${message}`);
+		console.error('[/api/subscriptions]', message);
+		throw error(500, message);
 	}
 };
