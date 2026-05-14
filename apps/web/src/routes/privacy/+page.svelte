@@ -23,31 +23,57 @@
 			<p class="lede">The short version: we don't collect your data. Here's what that actually means.</p>
 
 			<section>
-				<h2>What we store on our servers</h2>
-				<p>Nothing. PlainTube has no database.</p>
-				<p>When you sign in, Google sends us an access token. We wrap it in an encrypted, HTTP-only session cookie that lives in your browser. It is never written to a database or logged anywhere.</p>
+				<h2>Google user data accessed</h2>
+				<p>PlainTube accesses the following Google user data via the YouTube Data API v3, using the <code>https://www.googleapis.com/auth/youtube.readonly</code> OAuth scope:</p>
+				<ul>
+					<li>Your YouTube channel subscriptions (list of channels you subscribe to)</li>
+					<li>Your YouTube playlists and playlist items (including Watch Later)</li>
+					<li>Basic YouTube account identity (channel ID and display name, used to identify your session)</li>
+				</ul>
+				<p>No other Google or YouTube data is accessed.</p>
 			</section>
 
 			<section>
-				<h2>What stays in your browser</h2>
-				<p>Everything else — your watch history, saved videos, and inbox settings — is stored in your browser's <code>localStorage</code>. It never leaves your device. Clearing your browser data deletes it permanently; we have no copy.</p>
+				<h2>How we use that data</h2>
+				<p>The subscription and playlist data is fetched on demand from the YouTube Data API and displayed directly in the PlainTube interface so you can browse your feed without YouTube's recommendation algorithm. It is used solely to render the app's UI during your active session. We do not analyze, mine, or process it for any other purpose.</p>
+				<p>The OAuth access token Google provides is stored in an encrypted, HTTP-only session cookie in your browser. It is used only to make authenticated API calls to YouTube on your behalf. It is never written to a server-side database or logged.</p>
 			</section>
 
 			<section>
-				<h2>YouTube & Google</h2>
-				<p>PlainTube uses the YouTube Data API to read your subscriptions and playlists. This means Google knows you authorized PlainTube. What you watch inside PlainTube is played through the standard YouTube embed — YouTube's own privacy policy applies to that playback.</p>
-				<p>We request the minimum OAuth scope needed: read-only access to your YouTube account.</p>
+				<h2>Data sharing</h2>
+				<p>We do not sell, rent, or share your Google user data with any third parties for advertising, marketing, or analytics purposes.</p>
+				<p>The only data flows involving third parties are:</p>
+				<ul>
+					<li><strong>Google / YouTube:</strong> API requests are made to YouTube on your behalf using your access token. Google's own <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> governs that data.</li>
+					<li><strong>YouTube embeds:</strong> Videos you play are loaded via the standard YouTube embed player. YouTube may collect playback data under their own privacy policy.</li>
+					<li><strong>Vercel:</strong> PlainTube is hosted on Vercel. Vercel may collect standard web server logs (IP address, user-agent, request path) as described in <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel's Privacy Policy</a>. We do not pass Google user data to Vercel beyond what is incidentally present in normal HTTPS traffic.</li>
+				</ul>
 			</section>
 
 			<section>
-				<h2>Analytics & tracking</h2>
-				<p>None. No analytics scripts, no ad trackers, no third-party pixels.</p>
+				<h2>Data storage &amp; protection</h2>
+				<p>PlainTube has no server-side database. Google user data is never persisted on our infrastructure.</p>
+				<p>Your OAuth access token is stored exclusively in an encrypted, HTTP-only, Secure session cookie. It cannot be read by client-side JavaScript and is transmitted only over HTTPS.</p>
+				<p>Your watch history, saved videos, and inbox settings are stored in your browser's <code>localStorage</code>. This data never leaves your device and is not accessible to our servers.</p>
+			</section>
+
+			<section>
+				<h2>Data retention &amp; deletion</h2>
+				<p>Because we store no Google user data on our servers, there is nothing for us to delete. Your session cookie is cleared when you sign out or when it expires. Your <code>localStorage</code> data is deleted when you clear your browser storage.</p>
+				<p>You can revoke PlainTube's access to your Google account at any time by visiting <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google Account Permissions</a> and removing PlainTube. This immediately invalidates the access token.</p>
+				<p>To request confirmation that no data about you exists on our servers, or for any other data-related inquiry, email us at <a href="mailto:privacy@plaintube.tv">privacy@plaintube.tv</a>.</p>
+			</section>
+
+			<section>
+				<h2>Analytics &amp; tracking</h2>
+				<p>PlainTube uses Vercel Web Analytics to understand aggregate usage patterns — things like how many people visit the site, what device types and countries they come from, and which sites refer traffic here. No personally identifiable information is collected. There are no user IDs, no cross-session tracking, and no cookies. We cannot identify you from this data, and it is never shared with advertisers.</p>
+				<p>No other analytics scripts, ad trackers, or third-party pixels are loaded.</p>
 			</section>
 
 			<section>
 				<h2>Changes</h2>
 				<p>If this policy changes in a meaningful way, we'll update this page and note the date below.</p>
-				<p class="meta">Last updated: May 2025</p>
+				<p class="meta">Last updated: May 2026</p>
 			</section>
 		</div>
 
@@ -161,6 +187,29 @@
 	}
 
 	:global(.dark) p { color: #ccc; }
+
+	ul {
+		margin: 0.25rem 0 0;
+		padding-left: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	}
+
+	li {
+		font-size: 0.85rem;
+		color: #333;
+		line-height: 1.65;
+	}
+
+	:global(.dark) li { color: #ccc; }
+
+	a {
+		color: #0078d4;
+		text-decoration: none;
+	}
+
+	a:hover { text-decoration: underline; }
 
 	code {
 		font-family: 'IBM Plex Mono', monospace;
